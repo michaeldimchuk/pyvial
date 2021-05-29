@@ -1,0 +1,63 @@
+[tool.poetry]
+name = "pyvial"
+version = "0.0.1"
+description = "A micro web framework"
+authors = ["Michael Dimchuk <michaeldimchuk@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+isort = "^5.8.0"
+mypy = "^0.812"
+black = "^21.5b1"
+pylint = "^2.8.2"
+flake8 = "^3.9.2"
+flake8-bugbear = "^21.4.3"
+bandit = "^1.7.0"
+pre-commit = "^2.12.1"
+pytest = "^6.2.4"
+coverage = "^5.5"
+flake8-print = "^4.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER", "TESTS"]
+profile = "black"
+line_length = 120
+known_tests = ["tests"]
+combine_as_imports = true
+
+[tool.black]
+line-length = 120
+
+[tool.pylint.SIMILARITIES]
+ignore-imports = "yes"
+
+[tool.pylint."MESSAGES CONTROL"]
+max-line-length = 120
+min-public-methods = 1
+function-rgx = "[a-z_][a-z0-9_]{1,40}$"
+method-rgx = "[a-z_][a-z0-9_]{1,40}$"
+good-names = ["e", "i", "T"]
+disable = [
+    "C0114",  # missing-module-docstring
+    "C0115",  # missing-class-docstring
+    "C0116",  # missing-function-docstring
+    "R0902",  # too-many-instance-attributes
+    "R0903",  # too-few-public-methods
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["vial"]
+
+[tool.coverage.report]
+exclude_lines = ["pass"]
+precision = 2
+fail_under = 100

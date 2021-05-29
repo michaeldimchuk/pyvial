@@ -1,0 +1,107 @@
+{
+    "resource": "/some/{some_value}/paths",
+    "path": "/some/51ed5421-674d-4ebb-9aa5-da236ee97270/paths",
+    "httpMethod": "POST",
+    "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Content-Type": "application/json",
+        "correlation-id": "postman-71ff4137-958f-4a59-8d2e-1afaa58d177f",
+        "Host": "bbbbbbbbbb-vpce-aaaaaaaaaaaaaaaaa.execute-api.us-west-2.amazonaws.com",
+        "Postman-Token": "6a368dc7-2162-4a3b-9745-393ad666eee7",
+        "User-Agent": "PostmanRuntime/7.28.0",
+        "x-amzn-cipher-suite": "ECDHE-RSA-AES128-GCM-SHA256",
+        "x-amzn-tls-version": "TLSv1.2",
+        "x-amzn-vpc-id": "vpc-aaaaaaaaaaaaaaaaa",
+        "x-amzn-vpce-config": "1",
+        "x-amzn-vpce-id": "vpce-aaaaaaaaaaaaaaaaa",
+        "x-api-key": "very-secret-key",
+        "X-Forwarded-For": "10.10.10.10"
+    },
+    "multiValueHeaders": {
+        "Accept": [
+            "*/*"
+        ],
+        "Accept-Encoding": [
+            "gzip, deflate, br"
+        ],
+        "Content-Type": [
+            "application/json"
+        ],
+        "correlation-id": [
+            "postman-71ff4137-958f-4a59-8d2e-1afaa58d177f"
+        ],
+        "Host": [
+            "bbbbbbbbbb-vpce-aaaaaaaaaaaaaaaaa.execute-api.us-west-2.amazonaws.com"
+        ],
+        "Postman-Token": [
+            "6a368dc7-2162-4a3b-9745-393ad666eee7"
+        ],
+        "User-Agent": [
+            "PostmanRuntime/7.28.0"
+        ],
+        "x-amzn-cipher-suite": [
+            "ECDHE-RSA-AES128-GCM-SHA256"
+        ],
+        "x-amzn-tls-version": [
+            "TLSv1.2"
+        ],
+        "x-amzn-vpc-id": [
+            "vpc-aaaaaaaaaaaaaaaaa"
+        ],
+        "x-amzn-vpce-config": [
+            "1"
+        ],
+        "x-amzn-vpce-id": [
+            "vpce-aaaaaaaaaaaaaaaaa"
+        ],
+        "x-api-key": [
+            "very-secret-key"
+        ],
+        "X-Forwarded-For": [
+            "10.10.10.10"
+        ]
+    },
+    "queryStringParameters": null,
+    "multiValueQueryStringParameters": null,
+    "pathParameters": {
+        "some_value": "51ed5421-674d-4ebb-9aa5-da236ee97270"
+    },
+    "stageVariables": null,
+    "requestContext": {
+        "resourceId": "cccccc",
+        "resourcePath": "/some/{some_value}/paths",
+        "httpMethod": "POST",
+        "extendedRequestId": "fZhVhHIgiYcF_4A=",
+        "requestTime": "16/May/2021:01:57:55 +0000",
+        "path": "/dev/some/51ed5421-674d-4ebb-9aa5-da236ee97270/paths",
+        "accountId": "000000000000",
+        "protocol": "HTTP/1.1",
+        "stage": "dev",
+        "domainPrefix": "dddddddddd-vpce-aaaaaaaaaaaaaaaaa",
+        "requestTimeEpoch": 1621130275242,
+        "requestId": "76e06d25-a370-48f4-9bb1-d2f6435facd8",
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "cognitoIdentityId": null,
+            "vpceId": "vpce-aaaaaaaaaaaaaaaaa",
+            "apiKey": "very-secret-key",
+            "principalOrgId": null,
+            "cognitoAuthenticationType": null,
+            "userArn": null,
+            "apiKeyId": "ffffffffff",
+            "userAgent": "PostmanRuntime/7.28.0",
+            "accountId": null,
+            "caller": null,
+            "sourceIp": "10.10.10.10",
+            "accessKey": null,
+            "vpcId": "vpc-aaaaaaaaaaaaaaaaa",
+            "cognitoAuthenticationProvider": null,
+            "user": null
+        },
+        "domainName": "dddddddddd-vpce-aaaaaaaaaaaaaaaaa.execute-api.us-west-2.amazonaws.com",
+        "apiId": "dddddddddd"
+    },
+    "body": "{\n    \"hello\": \"world\",\n    \"top\": \"kek\"\n}",
+    "isBase64Encoded": false
+}
