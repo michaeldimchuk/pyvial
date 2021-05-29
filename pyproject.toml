@@ -1,5 +1,6 @@
 [tool.poetry]
 name = "pyvial"
+packages = [{include = "vial"}]
 version = "0.0.1"
 description = "A micro web framework"
 authors = ["Michael Dimchuk <michaeldimchuk@gmail.com>"]
