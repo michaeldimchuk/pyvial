@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Callable, Dict, Mapping, Optional, Tuple, Type, TypeVar
+from typing import Any, Dict, Optional, TypeVar
 
 T = TypeVar("T")
 
@@ -54,33 +54,13 @@ class HTTPMethod(Enum):
     TRACE = auto()
 
 
-class LambdaEvent:
+@dataclass
+class Request:
+    method: HTTPMethod
+    resource: str
+    path: str
+    headers: Dict[str, str]
+    query_parameters: Dict[str, str]
+    body: Optional[str]
     event: Dict[str, Any]
     context: LambdaContext
-
-    def __init__(self, event: Dict[str, Any], context: LambdaContext) -> None:
-        self.event = event
-        self.context = context
-
-
-@dataclass
-class HTTPEvent(LambdaEvent):
-    path: str
-    headers: Mapping[str, str]
-    body: Optional[str]
-
-
-class EventType(Enum):
-    value: Tuple[int, Type[LambdaEvent]]  # pylint: disable=invalid-name
-    HTTP = auto(), HTTPEvent
-    LAMBDA = auto(), LambdaEvent
-
-    def construct(self, event: Dict[str, Any], context: LambdaContext) -> LambdaEvent:
-        return self.value[1](event, context)
-
-
-@dataclass
-class LambdaHandler:
-    name: str
-    type: EventType
-    function: Callable[[Dict[str, Any], LambdaContext], Any]

@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Set
 from uuid import UUID
 
 from vial.app import Vial
@@ -6,9 +6,14 @@ from vial.types import LambdaContext
 
 from tests import loggers, resources
 
+log = loggers.new(__name__)
+
 app = Vial()
 
-log = loggers.new(__name__)
+
+@app.parser("set")
+def set_parser(value: str) -> Set[str]:
+    return {value}
 
 
 @app.get("/something/{some_value:uuid}/cool-stuff")

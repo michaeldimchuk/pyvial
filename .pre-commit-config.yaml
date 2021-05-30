@@ -33,4 +33,4 @@ repos:
         entry: bandit
         language: system
         types: [ python ]
-        args: ["--rqs", "B101,B404,B603,B311"]
+        args: ["-rqs", "B101,B404,B603,B311"]
