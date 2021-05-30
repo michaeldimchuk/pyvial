@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Dict, Optional, TypeVar
+from http import HTTPStatus
+from typing import Any, Dict, List, Mapping, Optional, TypeVar, Union
 
 T = TypeVar("T")
 
@@ -64,3 +65,10 @@ class Request:
     body: Optional[str]
     event: Dict[str, Any]
     context: LambdaContext
+
+
+@dataclass
+class Response:
+    body: Optional[Union[Mapping[str, Any], List[Any], str]] = None
+    headers: Mapping[str, str] = field(default_factory=dict)
+    status: Union[HTTPStatus, int] = HTTPStatus.OK

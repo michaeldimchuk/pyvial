@@ -1,9 +1,20 @@
+import json
 from typing import Any, Callable, Dict, Mapping
 
 from vial.errors import MethodNotAllowedError, NotFoundError
 from vial.parsers import KeywordParser
 from vial.routes import Route, RoutingAPI
-from vial.types import HTTPMethod, LambdaContext, Request, T
+from vial.types import HTTPMethod, LambdaContext, Request, Response, T
+
+
+class Json:
+    @staticmethod
+    def dumps(value: Any) -> str:
+        return json.dumps(value)
+
+    @staticmethod
+    def loads(value: str) -> Any:
+        return json.loads(value)
 
 
 class ParserAPI:
@@ -39,9 +50,18 @@ class RouteResolver:
 
 
 class RouteInvoker:
-    def __call__(self, route: Route, request: Request) -> Any:
+    def __call__(self, route: Route, request: Request) -> Response:
         args = self._build_args(route, request)
-        return route.function(*args.values())
+        result = route.function(*args.values())
+        return self._to_response(result)
+
+    @staticmethod
+    def _to_response(result: Any) -> Response:
+        if isinstance(result, Response):
+            return result
+        if result is None or not isinstance(result, tuple):
+            return Response(result)
+        return Response(*result)
 
     @staticmethod
     def _build_args(route: Route, request: Request) -> Mapping[str, Any]:
@@ -60,15 +80,26 @@ class Vial(RoutingAPI, ParserAPI):
 
     invoker_class = RouteInvoker
 
+    json_class = Json
+
     def __init__(self) -> None:
         super().__init__()
         self.route_resolver = self.route_resolver_class()
         self.invoker = self.invoker_class()
+        self.json = self.json_class()
 
-    def __call__(self, event: Dict[str, Any], context: LambdaContext) -> Any:
+    def __call__(self, event: Dict[str, Any], context: LambdaContext) -> Mapping[str, Any]:
         request = self._build_request(event, context)
         route = self.route_resolver(self.routes, request)
-        return self.invoker(route, request)
+        response = self.invoker(route, request)
+        return self._to_lambda_response(response)
+
+    def _to_lambda_response(self, response: Response) -> Mapping[str, Any]:
+        if not isinstance(response.body, str):
+            body = self.json.dumps(response.body) if response.body is not None else None
+        else:
+            body = response.body
+        return {"headers": response.headers, "statusCode": response.status, "body": body}
 
     @staticmethod
     def _build_request(event: Dict[str, Any], context: LambdaContext) -> Request:
