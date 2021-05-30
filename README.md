@@ -77,3 +77,27 @@ def get_user(user_ids: List[str]) -> User:
 ```
 As parsers are bound directly to the registered route function, they have to be defined before the route
 function that uses one is registered.
+
+## Json Encoding
+You can customize how Vial serializes / deserializes JSON objects by passing a custom encoder. The below
+example shows how to substitute the native JSON module with another library like `simplejson`:
+```
+import simplejson
+from vial.app import Vial, Json
+
+
+class SimpleJson(Json):
+    @staticmethod
+    def dumps(value: Any) -> str:
+        return simplejson.dumps(value)
+
+    @staticmethod
+    def loads(value: str) -> Any:
+        return simplejson.loads(value)
+
+class JsonVial:
+    json_class = SimpleJson
+
+
+app = SimpleJsonVial()
+```
