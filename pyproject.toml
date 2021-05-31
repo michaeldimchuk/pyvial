@@ -3,7 +3,7 @@ name = "pyvial"
 packages = [{include = "vial"}]
 version = "0.1.0"
 description = "A micro web framework for AWS Lambda."
-license = "MIT"
+license = "Apache-2.0"
 authors = ["Michael Dimchuk <michaeldimchuk@gmail.com>"]
 maintainers = ["Michael Dimchuk <michaeldimchuk@gmail.com>"]
 readme = "README.md"
