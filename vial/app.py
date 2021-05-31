@@ -1,10 +1,11 @@
 import json
-from typing import Any, Callable, Dict, Mapping
+from typing import Any, Dict, Mapping
 
+from vial.blueprints import Blueprint
 from vial.errors import MethodNotAllowedError, NotFoundError
-from vial.parsers import KeywordParser
+from vial.parsers import ParserAPI
 from vial.routes import Route, RoutingAPI
-from vial.types import HTTPMethod, LambdaContext, Request, Response, T
+from vial.types import HTTPMethod, LambdaContext, Request, Response
 
 
 class Json:
@@ -15,25 +16,6 @@ class Json:
     @staticmethod
     def loads(value: str) -> Any:
         return json.loads(value)
-
-
-class ParserAPI:
-
-    parser_class = KeywordParser
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.param_parser = self.parser_class()
-
-    def parser(self, name: str) -> Callable[[Callable[[str], T]], Callable[[str], T]]:
-        def registration_function(function: Callable[[str], T]) -> Callable[[str], T]:
-            self.register_parser(name, function)
-            return function
-
-        return registration_function
-
-    def register_parser(self, name: str, parser: Callable[[str], T]) -> None:
-        self.param_parser.register(name, parser)
 
 
 class RouteResolver:
@@ -87,6 +69,11 @@ class Vial(RoutingAPI, ParserAPI):
         self.route_resolver = self.route_resolver_class()
         self.invoker = self.invoker_class()
         self.json = self.json_class()
+
+    def register_blueprint(self, app: Blueprint) -> None:
+        self.param_parser.parsers.update(app.param_parser.parsers)
+        for resource, routes in app.routes.items():
+            self.routes[resource].update(routes)
 
     def __call__(self, event: Dict[str, Any], context: LambdaContext) -> Mapping[str, Any]:
         request = self._build_request(event, context)

@@ -4,6 +4,7 @@ from typing import Any, Dict, Mapping, Set
 from uuid import UUID
 
 from vial.app import Vial
+from vial.blueprints import Blueprint
 from vial.types import LambdaContext
 
 from tests import loggers, resources
@@ -24,9 +25,28 @@ def my_route(some_value: UUID) -> Mapping[str, str]:
     return {"hello": "world"}
 
 
+names = Blueprint()
+
+
+@names.get("/status")
+def get_status() -> Mapping[str, str]:
+    return {"general": "kenobi"}
+
+
+app.register_blueprint(names)
+
+
 def test_hello_world(context: LambdaContext) -> None:
     event: Dict[str, Any] = resources.read("get-with-variables.json")
     response = app(event, context)
     assert response["statusCode"] == HTTPStatus.OK
     assert response["headers"] == {}
     assert json.loads(response["body"]) == {"hello": "world"}
+
+
+def test_get_status(context: LambdaContext) -> None:
+    event: Dict[str, Any] = resources.read("get-without-variables.json")
+    response = app(event, context)
+    assert response["statusCode"] == HTTPStatus.OK
+    assert response["headers"] == {}
+    assert json.loads(response["body"]) == {"general": "kenobi"}

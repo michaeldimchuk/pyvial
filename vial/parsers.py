@@ -2,6 +2,8 @@ from decimal import Decimal
 from typing import Any, Callable, Mapping
 from uuid import UUID
 
+from vial.types import T
+
 Parser = Callable[[str], Any]
 
 
@@ -33,3 +35,22 @@ class KeywordParser:
         if name in self.parsers:
             raise ValueError(f"Parser for keyword {name} already exists")
         self.parsers[name] = parser
+
+
+class ParserAPI:
+
+    parser_class = KeywordParser
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.param_parser = self.parser_class()
+
+    def parser(self, name: str) -> Callable[[Callable[[str], T]], Callable[[str], T]]:
+        def registration_function(function: Callable[[str], T]) -> Callable[[str], T]:
+            self.register_parser(name, function)
+            return function
+
+        return registration_function
+
+    def register_parser(self, name: str, parser: Callable[[str], T]) -> None:
+        self.param_parser.register(name, parser)
