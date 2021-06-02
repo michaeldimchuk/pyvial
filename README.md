@@ -74,6 +74,30 @@ def get_user(user_ids: List[str]) -> User:
 As parsers are bound directly to the registered route function, they have to be defined before the route
 function that uses one is registered.
 
+## Blueprints
+As your application grows, you may want to split certain functionality amongst blueprints, similar to other
+popular frameworks like Flask.
+
+You can define a blueprint like this:
+```
+# store.py
+app = Blueprint()
+
+
+@app.get("/stores/{store_id}")
+def get_store(store_id: str) -> Store:
+    return store_service.get(store_id)
+
+
+# app.py
+from stores import app as stores_app
+
+
+app = Vial()
+
+app.register_blueprint(stores_app)
+```
+
 ## Json Encoding
 You can customize how Vial serializes / deserializes JSON objects by passing a custom encoder. The below
 example shows how to substitute the native JSON module with another library like `simplejson`:
