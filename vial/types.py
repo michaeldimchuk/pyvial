@@ -1,9 +1,19 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from http import HTTPStatus
-from typing import Any, Dict, List, Mapping, Optional, TypeVar, Union
+from typing import Any, Dict, List, Mapping, Optional, Protocol, TypeVar, Union
 
 T = TypeVar("T")
+
+
+class Json(Protocol):
+    @staticmethod
+    def dumps(value: Any) -> str:
+        ...
+
+    @staticmethod
+    def loads(value: str) -> Any:
+        ...
 
 
 @dataclass

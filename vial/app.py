@@ -1,14 +1,14 @@
 import json
-from typing import Any, Dict, Mapping
+from typing import Any, Dict, Mapping, Type
 
 from vial.blueprints import Blueprint
 from vial.errors import MethodNotAllowedError, NotFoundError
 from vial.parsers import ParserAPI
 from vial.routes import Route, RoutingAPI
-from vial.types import HTTPMethod, LambdaContext, Request, Response
+from vial.types import HTTPMethod, Json, LambdaContext, Request, Response
 
 
-class Json:
+class NativeJson:
     @staticmethod
     def dumps(value: Any) -> str:
         return json.dumps(value)
@@ -62,7 +62,7 @@ class Vial(RoutingAPI, ParserAPI):
 
     invoker_class = RouteInvoker
 
-    json_class = Json
+    json_class: Type[Json] = NativeJson
 
     def __init__(self) -> None:
         super().__init__()
@@ -71,9 +71,8 @@ class Vial(RoutingAPI, ParserAPI):
         self.json = self.json_class()
 
     def register_blueprint(self, app: Blueprint) -> None:
-        self.param_parser.parsers.update(app.param_parser.parsers)
-        for resource, routes in app.routes.items():
-            self.routes[resource].update(routes)
+        ParserAPI.register_parsers(self, app)
+        RoutingAPI.register_routes(self, app)
 
     def __call__(self, event: Dict[str, Any], context: LambdaContext) -> Mapping[str, Any]:
         request = self._build_request(event, context)

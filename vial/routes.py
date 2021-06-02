@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Tuple
@@ -46,6 +48,10 @@ class RoutingAPI:
             return function
 
         return registrar
+
+    def register_routes(self, other: RoutingAPI) -> None:
+        for resource, routes in other.routes.items():
+            self.routes[resource].update(routes)
 
     def _register_route(
         self, path: str, method: HTTPMethod, function: Callable[..., T], metadata: Mapping[str, Any]
