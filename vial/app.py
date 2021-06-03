@@ -106,12 +106,9 @@ class Vial(RoutingAPI, ParserAPI):
         RoutingAPI.register_routes(self, app)
 
     def __call__(self, event: Dict[str, Any], context: LambdaContext) -> Mapping[str, Any]:
-        request = self._build_request(event, context)
-        route = self.route_resolver(self.routes, request)
-        return self._invoke_safely(route, request)
-
-    def _invoke_safely(self, route: Route, request: Request) -> Mapping[str, Any]:
         try:
+            request = self._build_request(event, context)
+            route = self.route_resolver(self.routes, request)
             response = self.invoker(route, request)
         except Exception as error:  # pylint: disable=broad-except
             self.logger.exception("Encountered uncaught exception")
