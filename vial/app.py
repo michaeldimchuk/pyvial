@@ -1,8 +1,10 @@
 import json
+from http import HTTPStatus
 from typing import Any, Dict, Mapping, Type
 
+from vial import loggers
 from vial.blueprints import Blueprint
-from vial.errors import MethodNotAllowedError, NotFoundError
+from vial.errors import MethodNotAllowedError, NotFoundError, ServerError
 from vial.parsers import ParserAPI
 from vial.routes import Route, RoutingAPI
 from vial.types import HTTPMethod, Json, LambdaContext, Request, Response
@@ -56,6 +58,31 @@ class RouteInvoker:
         return args
 
 
+class ErrorHandler:
+
+    DEFAULT_STATUSES = {
+        Exception: HTTPStatus.INTERNAL_SERVER_ERROR,
+        ValueError: HTTPStatus.BAD_REQUEST,
+        NotImplementedError: HTTPStatus.NOT_IMPLEMENTED,
+    }
+
+    def __call__(self, error: Exception) -> Response:
+        return Response({"message": str(error)}, status=self._get_status_code(error))
+
+    def _get_status_code(self, error: Exception) -> HTTPStatus:
+        if isinstance(error, ServerError):
+            return error.status
+        return self._get_native_status_code(error)
+
+    def _get_native_status_code(self, error: Exception) -> HTTPStatus:
+        for error_type in type(error).__mro__:
+            if issubclass(error_type, Exception):
+                status = self.DEFAULT_STATUSES.get(error_type)
+                if status:
+                    return status
+        return HTTPStatus.INTERNAL_SERVER_ERROR
+
+
 class Vial(RoutingAPI, ParserAPI):
 
     route_resolver_class = RouteResolver
@@ -64,11 +91,15 @@ class Vial(RoutingAPI, ParserAPI):
 
     json_class: Type[Json] = NativeJson
 
+    error_handler_class = ErrorHandler
+
     def __init__(self) -> None:
         super().__init__()
         self.route_resolver = self.route_resolver_class()
+        self.error_handler = self.error_handler_class()
         self.invoker = self.invoker_class()
         self.json = self.json_class()
+        self.logger = loggers.build(__name__)
 
     def register_blueprint(self, app: Blueprint) -> None:
         ParserAPI.register_parsers(self, app)
@@ -77,7 +108,14 @@ class Vial(RoutingAPI, ParserAPI):
     def __call__(self, event: Dict[str, Any], context: LambdaContext) -> Mapping[str, Any]:
         request = self._build_request(event, context)
         route = self.route_resolver(self.routes, request)
-        response = self.invoker(route, request)
+        return self._invoke_safely(route, request)
+
+    def _invoke_safely(self, route: Route, request: Request) -> Mapping[str, Any]:
+        try:
+            response = self.invoker(route, request)
+        except Exception as error:  # pylint: disable=broad-except
+            self.logger.exception("Encountered uncaught exception")
+            response = self.error_handler(error)
         return self._to_lambda_response(response)
 
     def _to_lambda_response(self, response: Response) -> Mapping[str, Any]:

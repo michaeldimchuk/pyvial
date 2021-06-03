@@ -1,52 +1,24 @@
-import json
 from http import HTTPStatus
-from typing import Any, Dict, Mapping, Set
-from uuid import UUID
 
-from vial.app import Vial
-from vial.blueprints import Blueprint
-from vial.types import LambdaContext
+import pytest
 
-from tests import loggers, resources
+from vial.gateway import Gateway
 
-log = loggers.new(__name__)
-
-app = Vial()
+from tests.application.application import app
 
 
-@app.parser("set")
-def set_parser(value: str) -> Set[str]:
-    return {value}
+@pytest.fixture(scope="module", name="gateway")
+def gateway_fixture() -> Gateway:
+    return Gateway(app)
 
 
-@app.get("/something/{some_value:uuid}/cool-stuff")
-def my_route(some_value: UUID) -> Mapping[str, str]:
-    log.info("In my_route, value of type %s is %s", type(some_value), some_value)
-    return {"hello": "world"}
+def test_health(gateway: Gateway) -> None:
+    response = gateway.get("/health")
+    assert response.status == HTTPStatus.OK
+    assert response.body == {"status": "OK"}
 
 
-names = Blueprint()
-
-
-@names.get("/status")
-def get_status() -> Mapping[str, str]:
-    return {"general": "kenobi"}
-
-
-app.register_blueprint(names)
-
-
-def test_hello_world(context: LambdaContext) -> None:
-    event: Dict[str, Any] = resources.read("get-with-variables.json")
-    response = app(event, context)
-    assert response["statusCode"] == HTTPStatus.OK
-    assert response["headers"] == {}
-    assert json.loads(response["body"]) == {"hello": "world"}
-
-
-def test_get_status(context: LambdaContext) -> None:
-    event: Dict[str, Any] = resources.read("get-without-variables.json")
-    response = app(event, context)
-    assert response["statusCode"] == HTTPStatus.OK
-    assert response["headers"] == {}
-    assert json.loads(response["body"]) == {"general": "kenobi"}
+def test_get_user_not_found(gateway: Gateway) -> None:
+    response = gateway.get("/users/not_found")
+    assert response.status == HTTPStatus.NOT_FOUND
+    assert response.body == {"message": "User not found"}

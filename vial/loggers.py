@@ -4,7 +4,7 @@ from logging import Formatter, Logger, StreamHandler
 DEFAULT_FORMAT = "[%(levelname)s] %(asctime)s %(filename)s.%(funcName)s: %(message)30s"
 
 
-def new(name: str) -> Logger:
+def build(name: str) -> Logger:
     log = logging.getLogger(name)
     log.setLevel(logging.DEBUG)
     log.propagate = False

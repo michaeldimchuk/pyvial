@@ -5,9 +5,9 @@ class ServerError(Exception):
     status = HTTPStatus.INTERNAL_SERVER_ERROR
 
 
-class NotFoundError(Exception):
+class NotFoundError(ServerError):
     status = HTTPStatus.NOT_FOUND
 
 
-class MethodNotAllowedError(Exception):
+class MethodNotAllowedError(ServerError):
     status = HTTPStatus.METHOD_NOT_ALLOWED
