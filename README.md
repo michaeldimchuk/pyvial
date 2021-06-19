@@ -74,14 +74,16 @@ def get_user(user_ids: List[str]) -> User:
 As parsers are bound directly to the registered route function, they have to be defined before the route
 function that uses one is registered.
 
-## Blueprints
-As your application grows, you may want to split certain functionality amongst blueprints, similar to other
-popular frameworks like Flask.
+## Resources
+As your application grows, you may want to split certain functionality amongst resources, similar to
+blueprints of other popular frameworks like Flask.
 
-You can define a blueprint like this:
+You can define a resource like this:
 ```
 # store.py
-app = Blueprint()
+from vial.resources import Resource
+
+app = Resource()
 
 
 @app.get("/stores/{store_id}")
@@ -95,7 +97,7 @@ from stores import app as stores_app
 
 app = Vial()
 
-app.register_blueprint(stores_app)
+app.register_resource(stores_app)
 ```
 
 ## Json Encoding

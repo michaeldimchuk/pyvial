@@ -2,10 +2,10 @@ import dataclasses
 from dataclasses import dataclass
 from typing import Mapping, Optional, Tuple, Type
 
-from vial.blueprints import Blueprint
 from vial.errors import NotFoundError
+from vial.resources import Resource
 
-app = Blueprint()
+app = Resource()
 
 
 @dataclass

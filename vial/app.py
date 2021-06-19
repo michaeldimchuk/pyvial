@@ -2,10 +2,10 @@ import json
 from http import HTTPStatus
 from typing import Any, Dict, Mapping, Type
 
-from vial.blueprints import Blueprint
 from vial.errors import MethodNotAllowedError, NotFoundError, ServerError
 from vial.loggers import LoggerFactory
 from vial.parsers import ParserAPI
+from vial.resources import Resource
 from vial.routes import Route, RoutingAPI
 from vial.types import HTTPMethod, Json, LambdaContext, Request, Response
 
@@ -103,7 +103,7 @@ class Vial(RoutingAPI, ParserAPI):
         self.json = self.json_class()
         self.logger = self.logger_factory_class.get(__name__)
 
-    def register_blueprint(self, app: Blueprint) -> None:
+    def register_resource(self, app: Resource) -> None:
         ParserAPI.register_parsers(self, app)
         RoutingAPI.register_routes(self, app)
 
