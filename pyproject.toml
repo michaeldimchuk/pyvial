@@ -47,7 +47,7 @@ max-line-length = 120
 min-public-methods = 1
 function-rgx = "[a-z_][a-z0-9_]{1,40}$"
 method-rgx = "[a-z_][a-z0-9_]{1,40}$"
-good-names = ["e", "i", "T"]
+good-names = ["e", "i", "T", "E"]
 disable = [
     "C0114",  # missing-module-docstring
     "C0115",  # missing-class-docstring

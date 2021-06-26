@@ -3,9 +3,11 @@ from dataclasses import dataclass
 from typing import Mapping, Optional, Tuple, Type
 
 from vial.errors import NotFoundError
+from vial.middleware import CallChain
 from vial.resources import Resource
+from vial.types import Request, Response
 
-app = Resource()
+app = Resource(__name__)
 
 
 @dataclass
@@ -16,6 +18,13 @@ class User:
 
 
 _ERROR_SCENARIOS = {"not_found": (NotFoundError, "User not found")}
+
+
+@app.middleware
+def scoped_middleware(event: Request, chain: CallChain) -> Response:
+    response = chain(event)
+    response.headers["scoped"] = "scoped-middleware-executed"
+    return response
 
 
 @app.get("/users/{user_id}")

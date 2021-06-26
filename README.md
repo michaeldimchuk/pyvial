@@ -14,7 +14,7 @@ the Lambda handler should point to the `Vial` object in whichever file it's defi
 ```
 from vial.app import Vial
 
-app = Vial()
+app = Vial(__name__)
 ```
 If this code snippet is defined in an `app.py` file, the handler would be `app.app`.
 
@@ -23,7 +23,7 @@ If this code snippet is defined in an `app.py` file, the handler would be `app.a
 from typing import Mapping
 from vial.app import Vial
 
-app = Vial()
+app = Vial(__name__)
 
 
 @app.get("/hello-world")
@@ -68,8 +68,8 @@ def list_parser(value: str) -> List[str]:
 
 
 @app.get("/users/{user_id:list}")
-def get_user(user_ids: List[str]) -> User:
-    return user_service.get(user_id)
+def get_user(user_ids: List[str]) -> List[User]:
+    return [user_service.get(user_id) for user_id in user_ids]
 ```
 As parsers are bound directly to the registered route function, they have to be defined before the route
 function that uses one is registered.
@@ -83,7 +83,7 @@ You can define a resource like this:
 # store.py
 from vial.resources import Resource
 
-app = Resource()
+app = Resource(__name__)
 
 
 @app.get("/stores/{store_id}")
@@ -95,10 +95,41 @@ def get_store(store_id: str) -> Store:
 from stores import app as stores_app
 
 
-app = Vial()
+app = Vial(__name__)
 
 app.register_resource(stores_app)
 ```
+
+## Middleware
+You can register middleware functions to be executed before / after route invocations. All middleware is scoped to
+where it's registered. A middleware function registered with the `Vial` instance is scoped to all routes within
+the application, but a function registered with a `Resource` instance will only be invoked for routes defined in
+that specific resource.
+
+Below is an example of registering a middleware to log route invocation:
+```
+import logging
+from typing import Mapping
+from vial.app import Vial
+
+app = Vial(__name__)
+
+logger = logging.getLogger("my-app")
+
+@app.middleware
+def log_events(event: Request, chain: CallChain) -> Response:
+    logger.info("Began execution of %s", event.context)
+    try:
+        return chain(event)
+    finally:
+        logger.info("Completed execution of %s", event.context)
+
+
+@app.get("/hello-world")
+def hello_world() -> Mapping[str, str]:
+    return {"hello": "world"}
+```
+
 
 ## Json Encoding
 You can customize how Vial serializes / deserializes JSON objects by passing a custom encoder. The below

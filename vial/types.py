@@ -66,19 +66,23 @@ class HTTPMethod(Enum):
 
 
 @dataclass
-class Request:
+class LambdaEvent:
+    event: Dict[str, Any]
+    context: LambdaContext
+
+
+@dataclass
+class Request(LambdaEvent):
     method: HTTPMethod
     resource: str
     path: str
     headers: Dict[str, str]
     query_parameters: Dict[str, str]
     body: Optional[str]
-    event: Dict[str, Any]
-    context: LambdaContext
 
 
 @dataclass
 class Response:
     body: Optional[Union[Mapping[str, Any], List[Any], str]] = None
-    headers: Mapping[str, str] = field(default_factory=dict)
+    headers: Dict[str, str] = field(default_factory=dict)
     status: Union[HTTPStatus, int] = HTTPStatus.OK

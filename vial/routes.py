@@ -10,6 +10,7 @@ from vial.types import HTTPMethod, T
 
 @dataclass(frozen=True)
 class Route:
+    resource: str
     path: str
     method: HTTPMethod
     variables: Mapping[str, Parser]
@@ -18,6 +19,7 @@ class Route:
 
 
 class RoutingAPI:
+    name: str
     param_parser: KeywordParser
 
     def __init__(self) -> None:
@@ -62,11 +64,10 @@ class RoutingAPI:
     def _build_route(
         self, path: str, method: HTTPMethod, function: Callable[..., Any], metadata: Mapping[str, Any]
     ) -> Route:
-        components = path.split("/")
         parsed_components: List[str] = []
         variables: Dict[str, Parser] = {}
-        self._parse_components(components, parsed_components, variables)
-        return Route("/".join(parsed_components), method, variables, function, metadata)
+        self._parse_components(path.split("/"), parsed_components, variables)
+        return Route(self.name, "/".join(parsed_components), method, variables, function, metadata)
 
     def _parse_components(
         self, components: List[str], parsed_components: List[str], variables: Dict[str, Parser]

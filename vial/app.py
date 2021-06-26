@@ -4,13 +4,14 @@ from typing import Any, Dict, Mapping, Type
 
 from vial.errors import MethodNotAllowedError, NotFoundError, ServerError
 from vial.loggers import LoggerFactory
+from vial.middleware import CallChain, MiddlewareAPI, MiddlewareChain
 from vial.parsers import ParserAPI
 from vial.resources import Resource
 from vial.routes import Route, RoutingAPI
 from vial.types import HTTPMethod, Json, LambdaContext, Request, Response
 
 
-class NativeJson:
+class NativeJson(Json):
     @staticmethod
     def dumps(value: Any) -> str:
         return json.dumps(value)
@@ -83,7 +84,7 @@ class ErrorHandler:
         return HTTPStatus.INTERNAL_SERVER_ERROR
 
 
-class Vial(RoutingAPI, ParserAPI):
+class Vial(RoutingAPI, ParserAPI, MiddlewareAPI):
 
     route_resolver_class = RouteResolver
 
@@ -95,8 +96,9 @@ class Vial(RoutingAPI, ParserAPI):
 
     json_class: Type[Json] = NativeJson
 
-    def __init__(self) -> None:
+    def __init__(self, name: str) -> None:
         super().__init__()
+        self.name = name
         self.route_resolver = self.route_resolver_class()
         self.error_handler = self.error_handler_class()
         self.invoker = self.invoker_class()
@@ -106,16 +108,28 @@ class Vial(RoutingAPI, ParserAPI):
     def register_resource(self, app: Resource) -> None:
         ParserAPI.register_parsers(self, app)
         RoutingAPI.register_routes(self, app)
+        MiddlewareAPI.register_middlewares(self, app)
 
     def __call__(self, event: Dict[str, Any], context: LambdaContext) -> Mapping[str, Any]:
         try:
             request = self._build_request(event, context)
             route = self.route_resolver(self.routes, request)
-            response = self.invoker(route, request)
-        except Exception as error:  # pylint: disable=broad-except
+            response = self._build_invocation_chain(route)(request)
+        except Exception as e:  # pylint: disable=broad-except
             self.logger.exception("Encountered uncaught exception")
-            response = self.error_handler(error)
+            response = self.error_handler(e)
         return self._to_lambda_response(response)
+
+    def _build_invocation_chain(self, route: Route) -> CallChain:
+        all_middleware = self.registered_middleware[self.name] + self.registered_middleware[route.resource]
+
+        def route_invocation(event: Request) -> Response:
+            return self.invoker(route, event)
+
+        handler = MiddlewareChain(all_middleware[-1], route_invocation)
+        for middleware in reversed(all_middleware[0:-1]):
+            handler = MiddlewareChain(middleware, handler)
+        return handler
 
     def _to_lambda_response(self, response: Response) -> Mapping[str, Any]:
         if not isinstance(response.body, str):
@@ -127,12 +141,12 @@ class Vial(RoutingAPI, ParserAPI):
     @staticmethod
     def _build_request(event: Dict[str, Any], context: LambdaContext) -> Request:
         return Request(
+            event,
+            context,
             HTTPMethod[event["httpMethod"]],
             event["resource"],
             event["path"],
             event["headers"],
             event["queryStringParameters"],
             event["body"],
-            event,
-            context,
         )

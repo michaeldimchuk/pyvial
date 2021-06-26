@@ -1,12 +1,25 @@
 from typing import Mapping
 
 from vial.app import Vial
+from vial.middleware import CallChain
+from vial.types import Request, Response
 
 from tests.application.user_resource import app as user_app
 
-app = Vial()
+app = Vial(__name__)
 
 app.register_resource(user_app)
+
+
+@app.middleware
+def log_events(event: Request, chain: CallChain) -> Response:
+    app.logger.info("Began execution of %s", event.context)
+    try:
+        response = chain(event)
+        response.headers["logged"] = "middleware-executed"
+        return response
+    finally:
+        app.logger.info("Completed execution of %s", event.context)
 
 
 @app.get("/health")
