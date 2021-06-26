@@ -103,7 +103,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI):
         self.error_handler = self.error_handler_class()
         self.invoker = self.invoker_class()
         self.json = self.json_class()
-        self.logger = self.logger_factory_class.get(__name__)
+        self.logger = self.logger_factory_class.get(name)
 
     def register_resource(self, app: Resource) -> None:
         ParserAPI.register_parsers(self, app)
