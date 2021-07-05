@@ -1,9 +1,52 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from http import HTTPStatus
-from typing import Any, Dict, List, Mapping, Optional, Protocol, TypeVar, Union
+from typing import Any, Dict, Iterator, List, Mapping, MutableMapping, Optional, Protocol, TypeVar, Union
 
 T = TypeVar("T")
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+class MultiDict(MutableMapping[K, List[V]]):  # pylint: disable=too-many-ancestors
+    def __init__(self, values: Optional[MutableMapping[K, List[V]]] = None) -> None:
+        super().__init__()
+        self._values = values or {}
+
+    def __delitem__(self, key: K) -> None:
+        del self._values[key]
+
+    def __getitem__(self, key: K) -> List[V]:
+        return self._values[key]
+
+    def get_first(self, key: K) -> V:
+        values = self._values[key]
+        if not values:
+            raise KeyError(key)
+        return values[0]
+
+    def __iter__(self) -> Iterator[K]:
+        return iter(self._values)
+
+    def __len__(self) -> int:
+        return len(self._values)
+
+    def __setitem__(self, key: K, value: List[V]) -> None:
+        self._values[key] = value
+
+    def extend(self, key: K, value: List[V]) -> None:
+        existing_values = self._values.get(key)
+        if existing_values is not None:
+            existing_values.extend(value)
+        else:
+            self._values[key] = value
+
+    def add(self, key: K, value: V) -> None:
+        existing_values = self._values.get(key)
+        if existing_values is not None:
+            existing_values.append(value)
+        else:
+            self._values[key] = [value]
 
 
 class Json(Protocol):
@@ -76,8 +119,8 @@ class Request(LambdaEvent):
     method: HTTPMethod
     resource: str
     path: str
-    headers: Dict[str, str]
-    query_parameters: Dict[str, str]
+    headers: MultiDict[str, str]
+    query_parameters: MultiDict[str, str]
     body: Optional[str]
 
 

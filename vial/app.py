@@ -8,7 +8,7 @@ from vial.middleware import CallChain, MiddlewareAPI, MiddlewareChain
 from vial.parsers import ParserAPI
 from vial.resources import Resource
 from vial.routes import Route, RoutingAPI
-from vial.types import HTTPMethod, Json, LambdaContext, Request, Response
+from vial.types import HTTPMethod, Json, LambdaContext, MultiDict, Request, Response
 
 
 class NativeJson(Json):
@@ -146,7 +146,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI):
             HTTPMethod[event["httpMethod"]],
             event["resource"],
             event["path"],
-            event["headers"],
-            event["queryStringParameters"],
+            MultiDict(event["multiValueHeaders"]),
+            MultiDict(event["multiValueQueryStringParameters"]),
             event["body"],
         )

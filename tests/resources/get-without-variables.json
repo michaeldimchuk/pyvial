@@ -58,8 +58,14 @@
             "10.10.10.10"
         ]
     },
-    "queryStringParameters": null,
-    "multiValueQueryStringParameters": null,
+    "queryStringParameters": {
+        "hello": "world"
+    },
+    "multiValueQueryStringParameters": {
+        "hello": [
+            "world"
+        ]
+    },
     "pathParameters": null,
     "stageVariables": null,
     "requestContext": {

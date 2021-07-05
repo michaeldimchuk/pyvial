@@ -62,8 +62,14 @@
             "10.10.10.10"
         ]
     },
-    "queryStringParameters": null,
-    "multiValueQueryStringParameters": null,
+    "queryStringParameters": {
+        "hello": "world"
+    },
+    "multiValueQueryStringParameters": {
+        "hello": [
+            "world"
+        ]
+    },
     "pathParameters": {
         "some_value": "51ed5421-674d-4ebb-9aa5-da236ee97270"
     },

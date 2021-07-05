@@ -1,5 +1,6 @@
+from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, List, Mapping, Optional, Type
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Type, Union
 from urllib.parse import parse_qs, urlparse
 
 from vial.app import NativeJson, Vial
@@ -70,18 +71,32 @@ class Gateway:
         return Response(self.json.loads(body) if body else None, response["headers"], response["statusCode"])
 
     def build_request(
-        self, method: HTTPMethod, path: str, body: Optional[str], headers: Optional[Mapping[str, str]] = None
+        self,
+        method: HTTPMethod,
+        path: str,
+        body: Optional[str],
+        headers: Optional[Mapping[str, Union[str, Sequence[str]]]] = None,
     ) -> Dict[str, Any]:
         match = self.matcher.match(path)
         return {
             "httpMethod": method.name,
             "resource": match.route,
             "path": path,
-            "headers": headers or {},
-            "queryStringParameters": match.query_params,
+            "multiValueHeaders": self._build_headers(headers or {}),
+            "multiValueQueryStringParameters": match.query_params,
             "pathParameters": match.path_params,
             "body": body,
         }
+
+    @staticmethod
+    def _build_headers(headers: Mapping[str, Union[str, Sequence[str]]]) -> Mapping[str, List[str]]:
+        multi_headers: Mapping[str, List[str]] = defaultdict(list)
+        for name, value in headers.items():
+            if isinstance(value, Iterable):
+                multi_headers[name].extend(value)
+            else:
+                multi_headers[name].append(value)
+        return multi_headers
 
     @staticmethod
     def get_context() -> LambdaContext:
