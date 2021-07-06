@@ -1,5 +1,6 @@
-from typing import Mapping
+from typing import List, Mapping
 
+from vial import request
 from vial.app import Vial
 from vial.middleware import CallChain
 from vial.types import Request, Response
@@ -25,3 +26,8 @@ def log_events(event: Request, chain: CallChain) -> Response:
 @app.get("/health")
 def health() -> Mapping[str, str]:
     return {"status": "OK"}
+
+
+@app.get("/query-params-test")
+def get_query_params() -> Mapping[str, List[str]]:
+    return dict(request.get().query_parameters)

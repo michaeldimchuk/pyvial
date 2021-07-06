@@ -6,6 +6,7 @@ from vial.errors import MethodNotAllowedError, NotFoundError, ServerError
 from vial.loggers import LoggerFactory
 from vial.middleware import CallChain, MiddlewareAPI, MiddlewareChain
 from vial.parsers import ParserAPI
+from vial.request import RequestContext
 from vial.resources import Resource
 from vial.routes import Route, RoutingAPI
 from vial.types import HTTPMethod, Json, LambdaContext, MultiDict, Request, Response
@@ -111,14 +112,18 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI):
         MiddlewareAPI.register_middlewares(self, app)
 
     def __call__(self, event: Dict[str, Any], context: LambdaContext) -> Mapping[str, Any]:
+        request = self._build_request(event, context)
+        with RequestContext(request):
+            response = self._handle_request(request)
+            return self._to_lambda_response(response)
+
+    def _handle_request(self, request: Request) -> Response:
         try:
-            request = self._build_request(event, context)
             route = self.route_resolver(self.routes, request)
-            response = self._build_invocation_chain(route)(request)
+            return self._build_invocation_chain(route)(request)
         except Exception as e:  # pylint: disable=broad-except
             self.logger.exception("Encountered uncaught exception")
-            response = self.error_handler(e)
-        return self._to_lambda_response(response)
+            return self.error_handler(e)
 
     def _build_invocation_chain(self, route: Route) -> CallChain:
         all_middleware = self.registered_middleware[self.name] + self.registered_middleware[route.resource]

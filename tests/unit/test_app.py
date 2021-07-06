@@ -32,3 +32,9 @@ def test_get_user_not_found(gateway: Gateway) -> None:
     response = gateway.get("/users/not_found")
     assert response.status == HTTPStatus.NOT_FOUND
     assert response.body == {"message": "User not found"}
+
+
+def test_query_params(gateway: Gateway) -> None:
+    response = gateway.get("/query-params-test?hello=world&hello=monday&goodbye=world")
+    assert response.status == HTTPStatus.OK
+    assert response.body == {"hello": ["world", "monday"], "goodbye": ["world"]}
