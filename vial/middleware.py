@@ -8,7 +8,7 @@ from vial.types import Request, Response, T
 
 class CallChain(Protocol):
     def __call__(self, event: Request) -> Response:
-        ...
+        pass
 
 
 class MiddlewareChain:

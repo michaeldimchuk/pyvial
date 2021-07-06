@@ -20,19 +20,7 @@ class MultiDict(MutableMapping[K, List[V]]):  # pylint: disable=too-many-ancesto
         return self._values[key]
 
     def get_first(self, key: K) -> V:
-        values = self._values[key]
-        if not values:
-            raise KeyError(key)
-        return values[0]
-
-    def __iter__(self) -> Iterator[K]:
-        return iter(self._values)
-
-    def __len__(self) -> int:
-        return len(self._values)
-
-    def __setitem__(self, key: K, value: List[V]) -> None:
-        self._values[key] = value
+        return self._values[key][0]
 
     def extend(self, key: K, value: List[V]) -> None:
         existing_values = self._values.get(key)
@@ -48,15 +36,24 @@ class MultiDict(MutableMapping[K, List[V]]):  # pylint: disable=too-many-ancesto
         else:
             self._values[key] = [value]
 
+    def __iter__(self) -> Iterator[K]:
+        return iter(self._values)
+
+    def __len__(self) -> int:
+        return len(self._values)
+
+    def __setitem__(self, key: K, value: List[V]) -> None:
+        self._values[key] = value
+
 
 class Json(Protocol):
     @staticmethod
     def dumps(value: Any) -> str:
-        ...
+        pass
 
     @staticmethod
     def loads(value: str) -> Any:
-        ...
+        pass
 
 
 @dataclass
