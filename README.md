@@ -31,6 +31,25 @@ def hello_world() -> Mapping[str, str]:
     return {"hello": "world"}
 ```
 
+### Current Request
+The current request is tracked within a contextual object that wraps the lambda request. It can be accessed like so:
+```
+from typing import Mapping
+
+from vial import request
+from vial.app import Vial
+
+app = Vial(__name__)
+
+
+@app.get("/hello-world")
+def hello_world() -> Mapping[str, List[str]]:
+    query_params = request.get().query_parameters
+    if not query_params:
+        raise ValueError("Must provide at least one query parameter")
+    return dict(query_params)
+```
+
 ### Path Parameters
 You can define path parameters like this:
 ```
