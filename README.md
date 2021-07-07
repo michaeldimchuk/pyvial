@@ -1,5 +1,6 @@
 # Vial
-A micro web framework for AWS Lambda.
+Vial is an unopinionated micro web framework for AWS Lambda. It's main purpose is to provide an easy to use
+interface while also making the core functionality of the framework as modular as possible.
 
 ## Installation
 To add vial to your project, run the following command:
@@ -30,6 +31,33 @@ app = Vial(__name__)
 def hello_world() -> Mapping[str, str]:
     return {"hello": "world"}
 ```
+Basic `serverless.yml` file to deploy the project with the serverless framework:
+```
+service: my-function
+provider:
+  name: aws
+  runtime: python3.8
+  memorySize: 128
+  region: us-west-2
+
+package:
+  patterns:
+    - app.py
+
+functions:
+  api:
+    handler: app.app
+    events:
+      - http: get /hello-world
+
+custom:
+  pythonRequirements:
+    usePoetry: true
+
+plugins:
+  - serverless-python-requirements
+```
+You can now deploy the project with `serverless deploy`.
 
 ### Current Request
 The current request is tracked within a contextual object that wraps the lambda request. It can be accessed like so:
