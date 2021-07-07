@@ -3,9 +3,10 @@ from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Type, Union
 from urllib.parse import parse_qs, urlparse
 
-from vial.app import NativeJson, Vial
+from vial.app import Vial
 from vial.errors import NotFoundError
-from vial.types import HTTPMethod, Json, LambdaContext, Response
+from vial.json import Json, NativeJson
+from vial.types import HTTPMethod, LambdaContext, Response
 
 
 @dataclass

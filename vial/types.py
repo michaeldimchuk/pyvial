@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from http import HTTPStatus
-from typing import Any, Dict, Iterator, List, Mapping, MutableMapping, Optional, Protocol, TypeVar, Union
+from typing import Any, Dict, Iterator, List, Mapping, MutableMapping, Optional, TypeVar, Union
 
 T = TypeVar("T")
 K = TypeVar("K")
@@ -44,16 +44,6 @@ class MultiDict(MutableMapping[K, List[V]]):  # pylint: disable=too-many-ancesto
 
     def __setitem__(self, key: K, value: List[V]) -> None:
         self._values[key] = value
-
-
-class Json(Protocol):
-    @staticmethod
-    def dumps(value: Any) -> str:
-        pass
-
-    @staticmethod
-    def loads(value: str) -> Any:
-        pass
 
 
 @dataclass

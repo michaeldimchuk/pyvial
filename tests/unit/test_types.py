@@ -64,14 +64,5 @@ class TestMultiDict:
 
 class TestLambdaContext:
     @staticmethod
-    def test_get_remaining_time_in_millis() -> None:
-        context = LambdaContext(
-            "function_name",
-            "function_version",
-            "invoked_function_arn",
-            120,
-            "aws_request_id",
-            "log_group_name",
-            "log_stream_name",
-        )
+    def test_get_remaining_time_in_millis(context: LambdaContext) -> None:
         assert context.get_remaining_time_in_millis() == 0

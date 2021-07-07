@@ -1,25 +1,15 @@
-import json
 from http import HTTPStatus
 from typing import Any, Dict, Mapping, Type
 
 from vial.errors import MethodNotAllowedError, NotFoundError, ServerError
+from vial.json import Json, NativeJson
 from vial.loggers import LoggerFactory
 from vial.middleware import CallChain, MiddlewareAPI, MiddlewareChain
 from vial.parsers import ParserAPI
 from vial.request import RequestContext
 from vial.resources import Resource
 from vial.routes import Route, RoutingAPI
-from vial.types import HTTPMethod, Json, LambdaContext, MultiDict, Request, Response
-
-
-class NativeJson(Json):
-    @staticmethod
-    def dumps(value: Any) -> str:
-        return json.dumps(value)
-
-    @staticmethod
-    def loads(value: str) -> Any:
-        return json.loads(value)
+from vial.types import HTTPMethod, LambdaContext, MultiDict, Request, Response
 
 
 class RouteResolver:
