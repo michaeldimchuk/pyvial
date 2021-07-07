@@ -4,7 +4,7 @@ A micro web framework for AWS Lambda.
 ## Installation
 To add vial to your project, run the following command:
 ```
-pip install pyvial
+poetry add pyvial
 ```
 
 ## Usage
@@ -34,21 +34,24 @@ def hello_world() -> Mapping[str, str]:
 ### Current Request
 The current request is tracked within a contextual object that wraps the lambda request. It can be accessed like so:
 ```
-from typing import Mapping
+from typing import Mapping, List
 
 from vial import request
 from vial.app import Vial
+from vial.types import Request
 
 app = Vial(__name__)
 
 
 @app.get("/hello-world")
 def hello_world() -> Mapping[str, List[str]]:
-    query_params = request.get().query_parameters
+    request: Request = request.get()
+    query_params = request.query_parameters
     if not query_params:
         raise ValueError("Must provide at least one query parameter")
     return dict(query_params)
 ```
+The `request.get()` function is only available during a lambda request and will raise an error if called outside of one.
 
 ### Path Parameters
 You can define path parameters like this:
@@ -155,7 +158,8 @@ You can customize how Vial serializes / deserializes JSON objects by passing a c
 example shows how to substitute the native JSON module with another library like `simplejson`:
 ```
 import simplejson
-from vial.app import Vial, Json
+from vial.app import Vial
+from vial.json import Json
 
 
 class SimpleJson(Json):
@@ -167,7 +171,7 @@ class SimpleJson(Json):
     def loads(value: str) -> Any:
         return simplejson.loads(value)
 
-class JsonVial:
+class SimpleJsonVial:
     json_class = SimpleJson
 
 
