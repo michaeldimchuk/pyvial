@@ -92,6 +92,9 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
         def route_invocation(event: Request) -> Response:
             return self.invoker(route, event)
 
+        if not all_middleware:
+            return route_invocation
+
         handler = MiddlewareChain(all_middleware[-1], route_invocation)
         for middleware in reversed(all_middleware[0:-1]):
             handler = MiddlewareChain(middleware, handler)
