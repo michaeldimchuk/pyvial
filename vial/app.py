@@ -1,7 +1,6 @@
-from http import HTTPStatus
 from typing import Any, Dict, Mapping, Type
 
-from vial.errors import MethodNotAllowedError, NotFoundError, ServerError
+from vial.errors import ErrorHandlingAPI, MethodNotAllowedError, NotFoundError
 from vial.json import Json, NativeJson
 from vial.loggers import LoggerFactory
 from vial.middleware import CallChain, MiddlewareAPI, MiddlewareChain
@@ -50,32 +49,7 @@ class RouteInvoker:
         return args
 
 
-class ErrorHandler:
-
-    DEFAULT_STATUSES = {
-        Exception: HTTPStatus.INTERNAL_SERVER_ERROR,
-        ValueError: HTTPStatus.BAD_REQUEST,
-        NotImplementedError: HTTPStatus.NOT_IMPLEMENTED,
-    }
-
-    def __call__(self, error: Exception) -> Response:
-        return Response({"message": str(error)}, status=self._get_status_code(error))
-
-    def _get_status_code(self, error: Exception) -> HTTPStatus:
-        if isinstance(error, ServerError):
-            return error.status
-        return self._get_native_status_code(error)
-
-    def _get_native_status_code(self, error: Exception) -> HTTPStatus:
-        for error_type in type(error).__mro__:
-            if issubclass(error_type, Exception):
-                status = self.DEFAULT_STATUSES.get(error_type)
-                if status:
-                    return status
-        return HTTPStatus.INTERNAL_SERVER_ERROR
-
-
-class Vial(RoutingAPI, ParserAPI, MiddlewareAPI):
+class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
 
     route_resolver_class = RouteResolver
 
@@ -83,15 +57,12 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI):
 
     logger_factory_class = LoggerFactory
 
-    error_handler_class = ErrorHandler
-
     json_class: Type[Json] = NativeJson
 
     def __init__(self, name: str) -> None:
         super().__init__()
         self.name = name
         self.route_resolver = self.route_resolver_class()
-        self.error_handler = self.error_handler_class()
         self.invoker = self.invoker_class()
         self.json = self.json_class()
         self.logger = self.logger_factory_class.get(name)
@@ -113,7 +84,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI):
             return self._build_invocation_chain(route)(request)
         except Exception as e:  # pylint: disable=broad-except
             self.logger.exception("Encountered uncaught exception")
-            return self.error_handler(e)
+            return self.default_error_handler(e)
 
     def _build_invocation_chain(self, route: Route) -> CallChain:
         all_middleware = self.registered_middleware[self.name] + self.registered_middleware[route.resource]
