@@ -1,4 +1,4 @@
-from typing import Any, Dict, Mapping, Type
+from typing import Any, Type
 
 from vial.errors import ErrorHandlingAPI, MethodNotAllowedError, NotFoundError
 from vial.json import Json, NativeJson
@@ -12,7 +12,7 @@ from vial.types import HTTPMethod, LambdaContext, MultiDict, Request, Response
 
 
 class RouteResolver:
-    def __call__(self, resources: Mapping[str, Mapping[HTTPMethod, Route]], request: Request) -> Route:
+    def __call__(self, resources: dict[str, dict[HTTPMethod, Route]], request: Request) -> Route:
         defined_routes = resources.get(request.resource)
         if not defined_routes:
             raise NotFoundError(request.resource)
@@ -39,11 +39,11 @@ class RouteInvoker:
         return Response(*result)
 
     @staticmethod
-    def _build_args(route: Route, request: Request) -> Mapping[str, Any]:
+    def _build_args(route: Route, request: Request) -> dict[str, Any]:
         if not route.variables:
             return {}
-        path_params: Mapping[str, str] = request.event["pathParameters"]
-        args: Dict[str, Any] = {}
+        path_params: dict[str, str] = request.event["pathParameters"]
+        args: dict[str, Any] = {}
         for name, parser in route.variables.items():
             args[name] = parser(path_params[name])
         return args
@@ -72,7 +72,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
         RoutingAPI.register_routes(self, app)
         MiddlewareAPI.register_middlewares(self, app)
 
-    def __call__(self, event: Dict[str, Any], context: LambdaContext) -> Mapping[str, Any]:
+    def __call__(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         request = self._build_request(event, context)
         with RequestContext(request):
             response = self._handle_request(request)
@@ -100,7 +100,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
             handler = MiddlewareChain(middleware, handler)
         return handler
 
-    def _to_lambda_response(self, response: Response) -> Mapping[str, Any]:
+    def _to_lambda_response(self, response: Response) -> dict[str, Any]:
         if not isinstance(response.body, str):
             body = self.json.dumps(response.body) if response.body is not None else None
         else:
@@ -108,7 +108,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
         return {"headers": response.headers, "statusCode": response.status, "body": body}
 
     @staticmethod
-    def _build_request(event: Dict[str, Any], context: LambdaContext) -> Request:
+    def _build_request(event: dict[str, Any], context: LambdaContext) -> Request:
         return Request(
             event,
             context,

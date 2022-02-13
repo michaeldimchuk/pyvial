@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from decimal import Decimal
-from typing import Any, Callable, Mapping
+from typing import Any, Callable
 from uuid import UUID
 
 from vial.types import T
@@ -15,7 +13,7 @@ class KeywordParser:
     prior to being injected into route handler functions.
     """
 
-    DEFAULT_PARSERS: Mapping[str, Parser] = {
+    DEFAULT_PARSERS: dict[str, Parser] = {
         "str": str,
         "bool": bool,
         "int": int,
@@ -57,5 +55,5 @@ class ParserAPI:
     def register_parser(self, name: str, parser: Callable[[str], T]) -> None:
         self.param_parser.register(name, parser)
 
-    def register_parsers(self, other: ParserAPI) -> None:
+    def register_parsers(self, other: "ParserAPI") -> None:
         self.param_parser.parsers.update(other.param_parser.parsers)

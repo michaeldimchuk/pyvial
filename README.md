@@ -21,14 +21,13 @@ If this code snippet is defined in an `app.py` file, the handler would be `app.a
 
 ### Basic API
 ```
-from typing import Mapping
 from vial.app import Vial
 
 app = Vial(__name__)
 
 
 @app.get("/hello-world")
-def hello_world() -> Mapping[str, str]:
+def hello_world() -> dict[str, str]:
     return {"hello": "world"}
 ```
 Basic `serverless.yml` file to deploy the project with the serverless framework:
@@ -36,7 +35,7 @@ Basic `serverless.yml` file to deploy the project with the serverless framework:
 service: my-function
 provider:
   name: aws
-  runtime: python3.8
+  runtime: python3.9
   memorySize: 128
   region: us-west-2
 
@@ -62,8 +61,6 @@ You can now deploy the project with `serverless deploy`.
 ### Current Request
 The current request is tracked within a contextual object that wraps the lambda request. It can be accessed like so:
 ```
-from typing import Mapping, List
-
 from vial import request
 from vial.app import Vial
 from vial.types import Request
@@ -72,7 +69,7 @@ app = Vial(__name__)
 
 
 @app.get("/hello-world")
-def hello_world() -> Mapping[str, List[str]]:
+def hello_world() -> dict[str, list[str]]:
     request: Request = request.get()
     query_params = request.query_parameters
     if not query_params:
@@ -113,12 +110,12 @@ The following parsers are supported by default:
 You can register your own parser like this:
 ```
 @app.parser("list")
-def list_parser(value: str) -> List[str]:
+def list_parser(value: str) -> list[str]:
     return [value]
 
 
 @app.get("/users/{user_id:list}")
-def get_user(user_ids: List[str]) -> List[User]:
+def get_user(user_ids: list[str]) -> list[User]:
     return [user_service.get(user_id) for user_id in user_ids]
 ```
 As parsers are bound directly to the registered route function, they have to be defined before the route
@@ -159,7 +156,6 @@ that specific resource.
 Below is an example of registering a middleware to log route invocation:
 ```
 import logging
-from typing import Mapping
 from vial.app import Vial
 
 app = Vial(__name__)
@@ -176,7 +172,7 @@ def log_events(event: Request, chain: CallChain) -> Response:
 
 
 @app.get("/hello-world")
-def hello_world() -> Mapping[str, str]:
+def hello_world() -> dict[str, str]:
     return {"hello": "world"}
 ```
 

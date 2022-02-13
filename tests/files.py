@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, Callable, Mapping, TextIO, cast
+from typing import Any, Callable, TextIO, cast
 
 from vial.types import T
 
@@ -27,7 +27,7 @@ def _parse(file: TextIO) -> T:
     return cast(T, _get_parsers().get(extension[1:].lower(), default_parser)(file))
 
 
-def _get_parsers() -> Mapping[str, Callable[[TextIO], Any]]:
+def _get_parsers() -> dict[str, Callable[[TextIO], Any]]:
     return {"json": lambda file: json.loads(file.read())}
 
 

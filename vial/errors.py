@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Callable, MutableMapping, Type, TypeVar, cast
+from typing import Callable, Type, TypeVar, cast
 
 from vial.types import Response
 
@@ -39,7 +39,7 @@ class ErrorHandler:
     }
 
     def __init__(self) -> None:
-        self.error_handlers: MutableMapping[Type[Exception], Callable[[Exception], Response]] = {}
+        self.error_handlers: dict[Type[Exception], Callable[[Exception], Response]] = {}
         self.register_handler(Exception, self._default_handler)
 
     def register_handler(self, error_type: Type[Exception], handler: Callable[[E], Response]) -> None:

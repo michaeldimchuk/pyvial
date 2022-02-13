@@ -1,6 +1,6 @@
 import dataclasses
 from dataclasses import dataclass
-from typing import Mapping, Optional, Tuple, Type
+from typing import Optional, Type
 
 from vial.errors import NotFoundError
 from vial.middleware import CallChain
@@ -28,8 +28,8 @@ def scoped_middleware(event: Request, chain: CallChain) -> Response:
 
 
 @app.get("/users/{user_id}")
-def get_user(user_id: str) -> Mapping[str, str]:
-    scenario: Optional[Tuple[Type[Exception], str]] = _ERROR_SCENARIOS.get(user_id)
+def get_user(user_id: str) -> dict[str, str]:
+    scenario: Optional[tuple[Type[Exception], str]] = _ERROR_SCENARIOS.get(user_id)
     if scenario:
         raise scenario[0](scenario[1])
     return dataclasses.asdict(User(user_id, "John", "Doe"))

@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Tuple
+from typing import Any, Callable, Iterable
 
 from vial.parsers import KeywordParser, Parser
 from vial.types import HTTPMethod, T
@@ -13,9 +11,9 @@ class Route:
     resource: str
     path: str
     method: HTTPMethod
-    variables: Mapping[str, Parser]
+    variables: dict[str, Parser]
     function: Callable[..., Any]
-    metadata: Mapping[str, Any]
+    metadata: dict[str, Any]
 
 
 class RoutingAPI:
@@ -24,7 +22,7 @@ class RoutingAPI:
 
     def __init__(self) -> None:
         super().__init__()
-        self.routes: Dict[str, Dict[HTTPMethod, Route]] = defaultdict(dict)
+        self.routes: dict[str, dict[HTTPMethod, Route]] = defaultdict(dict)
 
     def post(self, path: str, **kwargs: Any) -> Callable[[Callable[..., T]], Callable[..., T]]:
         return self.route(path, [HTTPMethod.POST], **kwargs)
@@ -51,26 +49,26 @@ class RoutingAPI:
 
         return registrar
 
-    def register_routes(self, other: RoutingAPI) -> None:
+    def register_routes(self, other: "RoutingAPI") -> None:
         for resource, routes in other.routes.items():
             self.routes[resource].update(routes)
 
     def _register_route(
-        self, path: str, method: HTTPMethod, function: Callable[..., T], metadata: Mapping[str, Any]
+        self, path: str, method: HTTPMethod, function: Callable[..., T], metadata: dict[str, Any]
     ) -> None:
         route = self._build_route(path, method, function, metadata)
         self.routes[route.path][method] = route
 
     def _build_route(
-        self, path: str, method: HTTPMethod, function: Callable[..., Any], metadata: Mapping[str, Any]
+        self, path: str, method: HTTPMethod, function: Callable[..., Any], metadata: dict[str, Any]
     ) -> Route:
-        parsed_components: List[str] = []
-        variables: Dict[str, Parser] = {}
+        parsed_components: list[str] = []
+        variables: dict[str, Parser] = {}
         self._parse_components(path.split("/"), parsed_components, variables)
         return Route(self.name, "/".join(parsed_components), method, variables, function, metadata)
 
     def _parse_components(
-        self, components: List[str], parsed_components: List[str], variables: Dict[str, Parser]
+        self, components: list[str], parsed_components: list[str], variables: dict[str, Parser]
     ) -> None:
         for component in components:
             if component.startswith("{") and component.endswith("}"):
@@ -80,7 +78,7 @@ class RoutingAPI:
             else:
                 parsed_components.append(component)
 
-    def _build_variable(self, component: str) -> Tuple[str, Parser]:
+    def _build_variable(self, component: str) -> tuple[str, Parser]:
         placeholder = component[1:-1]
         name_and_parser = placeholder.split(":")
         if len(name_and_parser) == 1:

@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from collections import defaultdict
-from typing import Callable, Dict, List, Protocol
+from typing import Callable, Protocol
 
 from vial.types import Request, Response, T
 
@@ -25,7 +23,7 @@ class MiddlewareAPI:
 
     def __init__(self) -> None:
         super().__init__()
-        self.registered_middleware: Dict[str, List[Callable[[Request, CallChain], T]]] = defaultdict(list)
+        self.registered_middleware: dict[str, list[Callable[[Request, CallChain], T]]] = defaultdict(list)
 
     def middleware(self, function: Callable[[Request, CallChain], T]) -> Callable[[Request, CallChain], T]:
         self.register_middleware(function)
@@ -34,5 +32,5 @@ class MiddlewareAPI:
     def register_middleware(self, middleware: Callable[[Request, CallChain], T]) -> None:
         self.registered_middleware[self.name].append(middleware)
 
-    def register_middlewares(self, other: MiddlewareAPI) -> None:
+    def register_middlewares(self, other: "MiddlewareAPI") -> None:
         self.registered_middleware.update(other.registered_middleware)

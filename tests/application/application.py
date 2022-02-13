@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import List, Mapping, Union
+from typing import Union
 
 from vial import request
 from vial.app import Vial
@@ -32,12 +32,12 @@ def custom_error_handler(error: Union[CustomUnauthorizedError, CustomForbiddenEr
 
 
 @app.get("/health")
-def health() -> Mapping[str, str]:
+def health() -> dict[str, str]:
     return {"status": "OK"}
 
 
 @app.get("/query-params-test")
-def get_query_params() -> Mapping[str, List[str]]:
+def get_query_params() -> dict[str, list[str]]:
     return dict(request.get().query_parameters)
 
 

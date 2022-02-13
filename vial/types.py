@@ -1,28 +1,28 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from http import HTTPStatus
-from typing import Any, Dict, Iterator, List, Mapping, MutableMapping, Optional, TypeVar, Union
+from typing import Any, Iterator, Optional, TypeVar, Union
 
 T = TypeVar("T")
 K = TypeVar("K")
 V = TypeVar("V")
 
 
-class MultiDict(MutableMapping[K, List[V]]):  # pylint: disable=too-many-ancestors
-    def __init__(self, values: Optional[MutableMapping[K, List[V]]] = None) -> None:
+class MultiDict(dict[K, list[V]]):  # pylint: disable=too-many-ancestors
+    def __init__(self, values: Optional[dict[K, list[V]]] = None) -> None:
         super().__init__()
         self._values = values or {}
 
     def __delitem__(self, key: K) -> None:
         del self._values[key]
 
-    def __getitem__(self, key: K) -> List[V]:
+    def __getitem__(self, key: K) -> list[V]:
         return self._values[key]
 
     def get_first(self, key: K) -> V:
         return self._values[key][0]
 
-    def extend(self, key: K, value: List[V]) -> None:
+    def extend(self, key: K, value: list[V]) -> None:
         existing_values = self._values.get(key)
         if existing_values is not None:
             existing_values.extend(value)
@@ -42,7 +42,7 @@ class MultiDict(MutableMapping[K, List[V]]):  # pylint: disable=too-many-ancesto
     def __len__(self) -> int:
         return len(self._values)
 
-    def __setitem__(self, key: K, value: List[V]) -> None:
+    def __setitem__(self, key: K, value: list[V]) -> None:
         self._values[key] = value
 
 
@@ -64,8 +64,8 @@ class MobileClient:
 @dataclass
 class ClientContext:
     client: MobileClient
-    custom: Dict[str, Any]
-    env: Dict[str, Any]
+    custom: dict[str, Any]
+    env: dict[str, Any]
 
 
 @dataclass
@@ -97,7 +97,7 @@ class HTTPMethod(Enum):
 
 @dataclass
 class LambdaEvent:
-    event: Dict[str, Any]
+    event: dict[str, Any]
     context: LambdaContext
 
 
@@ -113,6 +113,6 @@ class Request(LambdaEvent):
 
 @dataclass
 class Response:
-    body: Optional[Union[Mapping[str, Any], List[Any], str]] = None
-    headers: Dict[str, str] = field(default_factory=dict)
+    body: Optional[Union[dict[str, Any], list[Any], str]] = None
+    headers: dict[str, str] = field(default_factory=dict)
     status: Union[HTTPStatus, int] = HTTPStatus.OK
