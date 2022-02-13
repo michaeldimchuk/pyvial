@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "pyvial"
 packages = [{include = "vial"}]
-version = "0.10.0"
+version = "0.11.0"
 description = "A micro web framework for AWS Lambda."
 license = "Apache-2.0"
 authors = ["Michael Dimchuk <michaeldimchuk@gmail.com>"]
@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/michaeldimchuk/pyvial"
 
 [tool.poetry.dependencies]
-python = "~3.9"
+python = "^3.9"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"
