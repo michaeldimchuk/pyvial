@@ -1,5 +1,5 @@
 import logging
-from logging import Formatter, Logger, StreamHandler
+from logging import Formatter, Handler, Logger, StreamHandler
 
 
 class LoggerFactory:
@@ -15,7 +15,7 @@ class LoggerFactory:
         return log
 
     @classmethod
-    def get_handler(cls) -> StreamHandler:
+    def get_handler(cls) -> Handler:
         handler = StreamHandler()
         handler.setFormatter(Formatter(cls.DEFAULT_FORMAT))
         return handler

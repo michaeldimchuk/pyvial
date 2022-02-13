@@ -14,7 +14,7 @@ def read(path: str) -> T:
 def _get_file(path: str) -> T:
     if not os.path.exists(path):
         raise ValueError(f"File {path} does not exist")
-    with open(path) as file:
+    with open(path, encoding="utf-8") as file:
         return _parse(file)
 
 
