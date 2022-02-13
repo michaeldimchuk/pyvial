@@ -1,14 +1,14 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from http import HTTPStatus
-from typing import Any, Iterator, Optional, TypeVar, Union
+from typing import Any, Iterator, MutableMapping, Optional, TypeVar, Union
 
 T = TypeVar("T")
 K = TypeVar("K")
 V = TypeVar("V")
 
 
-class MultiDict(dict[K, list[V]]):  # pylint: disable=too-many-ancestors
+class MultiDict(MutableMapping[K, list[V]]):  # pylint: disable=too-many-ancestors
     def __init__(self, values: Optional[dict[K, list[V]]] = None) -> None:
         super().__init__()
         self._values = values or {}
@@ -44,6 +44,12 @@ class MultiDict(dict[K, list[V]]):  # pylint: disable=too-many-ancestors
 
     def __setitem__(self, key: K, value: list[V]) -> None:
         self._values[key] = value
+
+    def __str__(self) -> str:
+        return str(self._values)
+
+    def __repr__(self) -> str:
+        return repr(self._values)
 
 
 @dataclass
