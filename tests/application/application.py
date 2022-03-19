@@ -85,25 +85,10 @@ def really_bad_error() -> None:
 
 
 @app.get("/method-test")
-def get_response() -> dict[str, str]:
-    return {"method": HTTPMethod.GET.name}
-
-
 @app.post("/method-test")
-def post_response() -> dict[str, str]:
-    return {"method": HTTPMethod.POST.name}
-
-
 @app.put("/method-test")
-def put_response() -> dict[str, str]:
-    return {"method": HTTPMethod.PUT.name}
-
-
 @app.patch("/method-test")
-def patch_response() -> dict[str, str]:
-    return {"method": HTTPMethod.PATCH.name}
-
-
 @app.delete("/method-test")
-def delete_response() -> dict[str, str]:
-    return {"method": HTTPMethod.DELETE.name}
+@app.route("/method-test", [HTTPMethod.OPTIONS, HTTPMethod.TRACE])
+def return_method() -> dict[str, str]:
+    return {"method": request.get().method.name}
