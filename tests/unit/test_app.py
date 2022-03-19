@@ -50,6 +50,12 @@ def test_string_returned(gateway: Gateway) -> None:
     assert response.body == {"status": "OK"}
 
 
+def test_parser(gateway: Gateway) -> None:
+    response = gateway.get("/parser-type-returned/hello_world")
+    assert response.status == HTTPStatus.OK
+    assert response.body == {"type": str(list), "value": list("hello_world")}
+
+
 def test_get_user_scoped_middleware(gateway: Gateway) -> None:
     response = gateway.get("/users/12345")
     assert response.status == HTTPStatus.OK

@@ -1,6 +1,6 @@
 import json
 from http import HTTPStatus
-from typing import Union
+from typing import Any, Union
 
 from vial import request
 from vial.app import Vial
@@ -25,6 +25,11 @@ def log_events(event: Request, chain: CallChain) -> Response:
         return response
     finally:
         app.logger.info("Completed execution of %s", event.context)
+
+
+@app.parser("list")
+def set_parser(value: str) -> list[str]:
+    return list(value)
 
 
 @app.error_handler(CustomUnauthorizedError, CustomForbiddenError)
@@ -52,6 +57,11 @@ def tuple_returned() -> tuple[dict[str, str], dict[str, str], HTTPStatus]:
 @app.get("/string-returned")
 def string_returned() -> str:
     return json.dumps({"status": "OK"})
+
+
+@app.get("/parser-type-returned/{some_variable:list}")
+def parser_type_returned(some_variable: list[str]) -> dict[str, Any]:
+    return {"type": str(type(some_variable)), "value": some_variable}
 
 
 @app.get("/query-params-test")
