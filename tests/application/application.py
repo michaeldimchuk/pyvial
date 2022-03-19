@@ -1,3 +1,4 @@
+import json
 from http import HTTPStatus
 from typing import Union
 
@@ -10,6 +11,7 @@ from tests.application.exceptions import CustomForbiddenError, CustomUnauthorize
 from tests.application.user_resource import app as user_app
 
 app = Vial(__name__)
+app_without_middleware = Vial("no_middleware")
 
 app.register_resource(user_app)
 
@@ -32,8 +34,24 @@ def custom_error_handler(error: Union[CustomUnauthorizedError, CustomForbiddenEr
 
 
 @app.get("/health")
+@app_without_middleware.get("/health")
 def health() -> dict[str, str]:
     return {"status": "OK"}
+
+
+@app.get("/response-returned")
+def response_returned() -> Response:
+    return Response({"status": "OK"}, {"custom-header": "custom-value"}, HTTPStatus.ACCEPTED)
+
+
+@app.get("/tuple-returned")
+def tuple_returned() -> tuple[dict[str, str], dict[str, str], HTTPStatus]:
+    return {"status": "OK"}, {"custom-header": "custom-value"}, HTTPStatus.OK
+
+
+@app.get("/string-returned")
+def string_returned() -> str:
+    return json.dumps({"status": "OK"})
 
 
 @app.get("/query-params-test")
