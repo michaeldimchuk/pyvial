@@ -11,9 +11,9 @@ test:
 lint:
 	isort --check $(modules)
 	black --quiet --check $(modules)
-	flake8 --max-complexity 5 $(modules)
+	flake8 $(modules)
 	pylint $(modules)
-	mypy --strict $(modules)
+	mypy --show-error-codes --strict $(modules)
 	bandit -rqs B101,B404,B603,B311 $(modules)
 
 format:
