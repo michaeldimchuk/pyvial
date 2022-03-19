@@ -1,6 +1,9 @@
+import dataclasses
 import json
+from enum import Enum
 from json.encoder import JSONEncoder
-from typing import Any, Protocol
+from typing import Any, Callable, Protocol, Type
+from uuid import UUID
 
 
 class Json(Protocol):
@@ -13,10 +16,29 @@ class Json(Protocol):
         pass
 
 
+def _enum_to_string(value: Enum) -> str:
+    return value.name
+
+
+def _instance_check(class_: Type[Any]) -> Callable[[Any], bool]:
+    def instance_checker(value: Any) -> bool:
+        return isinstance(value, class_)
+
+    return instance_checker
+
+
 class DefaultEncoder(JSONEncoder):
+    ENCODERS: list[tuple[Callable[[Any], bool], Callable[[Any], Any]]] = [
+        (_instance_check(set), list),
+        (_instance_check(UUID), str),
+        (_instance_check(Enum), _enum_to_string),
+        (dataclasses.is_dataclass, dataclasses.asdict),
+    ]
+
     def default(self, o: Any) -> Any:
-        if isinstance(o, set):
-            return list(o)
+        for checker, encoder in self.ENCODERS:
+            if checker(o):
+                return encoder(o)
         return super().default(o)
 
 
