@@ -125,3 +125,12 @@ def test_missing_default_handler_and_default_status(gateway: Gateway) -> None:
     response = gateway.get("/really-bad-error")
     assert response.status == HTTPStatus.INTERNAL_SERVER_ERROR
     assert response.body == {"message": "This can't happen"}
+
+
+@pytest.mark.parametrize(
+    "method", [HTTPMethod.GET, HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH, HTTPMethod.DELETE]
+)
+def test_method_bindings(method: HTTPMethod, gateway: Gateway) -> None:
+    response = gateway.request(method, "/method-test")
+    assert response.status == HTTPStatus.OK
+    assert response.body == {"method": method.name}

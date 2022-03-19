@@ -5,7 +5,7 @@ from typing import Any, Union
 from vial import request
 from vial.app import Vial
 from vial.middleware import CallChain
-from vial.types import Request, Response
+from vial.types import HTTPMethod, Request, Response
 
 from tests.application.exceptions import CustomForbiddenError, CustomUnauthorizedError
 from tests.application.user_resource import app as user_app
@@ -82,3 +82,28 @@ def custom_unauthorized_error() -> None:
 @app.get("/really-bad-error")
 def really_bad_error() -> None:
     raise Exception("This can't happen")
+
+
+@app.get("/method-test")
+def get_response() -> dict[str, str]:
+    return {"method": HTTPMethod.GET.name}
+
+
+@app.post("/method-test")
+def post_response() -> dict[str, str]:
+    return {"method": HTTPMethod.POST.name}
+
+
+@app.put("/method-test")
+def put_response() -> dict[str, str]:
+    return {"method": HTTPMethod.PUT.name}
+
+
+@app.patch("/method-test")
+def patch_response() -> dict[str, str]:
+    return {"method": HTTPMethod.PATCH.name}
+
+
+@app.delete("/method-test")
+def delete_response() -> dict[str, str]:
+    return {"method": HTTPMethod.DELETE.name}
