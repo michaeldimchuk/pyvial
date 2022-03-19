@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from vial.gateway import Gateway
+from vial.types import HTTPMethod
 
 from tests.application.application import app
 
@@ -51,6 +52,20 @@ def test_custom_unauthorized_error(gateway: Gateway) -> None:
     response = gateway.get("/custom-unauthorized-error")
     assert response.status == HTTPStatus.UNAUTHORIZED
     assert response.body == {"message": "Learn to type passwords"}
+
+
+def test_not_found_error(gateway: Gateway) -> None:
+    request = {
+        "httpMethod": HTTPMethod.GET.name,
+        "resource": "/this-probably-isnt-defined",
+        "path": "/this-probably-isnt-defined",
+        "multiValueHeaders": {},
+        "multiValueQueryStringParameters": {},
+        "pathParameters": {},
+        "body": None,
+    }
+    response = gateway.build_response(gateway.app(request, gateway.get_context()))
+    assert response.status == HTTPStatus.NOT_FOUND
 
 
 @patch.dict(app.default_error_handler.error_handlers, {Exception: None})

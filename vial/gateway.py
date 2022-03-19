@@ -8,6 +8,8 @@ from vial.errors import NotFoundError
 from vial.json import Json, NativeJson
 from vial.types import HTTPMethod, LambdaContext, Response
 
+Headers = dict[str, Union[str, list[str]]]
+
 
 @dataclass
 class Match:
@@ -65,9 +67,17 @@ class Gateway:
         self.json = self.json_class()
         self.matcher = RouteMatcher(list(app.routes))
 
-    def get(self, path: str, headers: Optional[dict[str, Union[str, list[str]]]] = None) -> Response:
-        request = self.build_request(HTTPMethod.GET, path, None, headers)
+    def get(self, path: str, headers: Optional[Headers] = None) -> Response:
+        return self.request(HTTPMethod.GET, path, headers=headers)
+
+    def request(
+        self, method: HTTPMethod, path: str, body: Optional[str] = None, headers: Optional[Headers] = None
+    ) -> Response:
+        request = self.build_request(method, path, body, headers)
         response = self.app(request, self.get_context())
+        return self.build_response(response)
+
+    def build_response(self, response: dict[str, Any]) -> Response:
         body: Optional[str] = response["body"]
         return Response(self.json.loads(body) if body else None, response["headers"], response["statusCode"])
 
@@ -75,8 +85,8 @@ class Gateway:
         self,
         method: HTTPMethod,
         path: str,
-        body: Optional[str],
-        headers: Optional[dict[str, Union[str, list[str]]]] = None,
+        body: Optional[str] = None,
+        headers: Optional[Headers] = None,
     ) -> dict[str, Any]:
         match = self.matcher.match(path)
         return {
@@ -90,7 +100,7 @@ class Gateway:
         }
 
     @staticmethod
-    def _build_headers(headers: dict[str, Union[str, list[str]]]) -> dict[str, list[str]]:
+    def _build_headers(headers: Headers) -> dict[str, list[str]]:
         multi_headers: dict[str, list[str]] = defaultdict(list)
         for name, value in headers.items():
             if isinstance(value, Iterable):

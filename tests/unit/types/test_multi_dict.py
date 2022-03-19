@@ -1,3 +1,5 @@
+from typing import Any, Callable, Mapping
+
 import pytest
 
 from vial.types import MultiDict
@@ -58,3 +60,10 @@ def test_set() -> None:
 
     values["hello"] = ["world"]
     assert values["hello"] == ["world"]
+
+
+@pytest.mark.parametrize("method", [str, repr])
+def test_proxy_methods(method: Callable[[Mapping[str, Any]], str]) -> None:
+    internal_values = {"hello": ["world"], "goodbye": ["world"]}
+    values = MultiDict(internal_values)
+    assert method(values) == method(internal_values)

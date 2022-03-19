@@ -15,11 +15,11 @@ class RouteResolver:
     def __call__(self, resources: dict[str, dict[HTTPMethod, Route]], request: Request) -> Route:
         defined_routes = resources.get(request.resource)
         if not defined_routes:
-            raise NotFoundError(request.resource)
+            raise NotFoundError(f"No route defined for {request.resource}")
 
         route = defined_routes.get(request.method)
         if not route:
-            raise MethodNotAllowedError(request.method.name)
+            raise MethodNotAllowedError(f"No route defined for method {request.method.name}")
 
         return route
 
