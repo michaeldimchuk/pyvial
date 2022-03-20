@@ -1,6 +1,6 @@
-import time
 from typing import Any, Optional
 
+from vial import timestamps
 from vial.errors import ServerError
 from vial.types import Request
 
@@ -10,11 +10,11 @@ class RequestContext:
 
     def __init__(self, request: Request) -> None:
         self.request = request
-        self.start_time = _get_timestamp()
+        self.start_time = timestamps.epoch_millis()
 
     @property
     def elapsed_time(self) -> float:
-        return _get_timestamp() - self.start_time
+        return timestamps.epoch_millis() - self.start_time
 
     @property
     def remaining_time(self) -> int:
@@ -32,10 +32,6 @@ class RequestContext:
         if not cls._INSTANCE:
             raise ServerError("Not currently within a request")
         return cls._INSTANCE
-
-
-def _get_timestamp() -> float:
-    return time.time() * 1000
 
 
 def get() -> Request:

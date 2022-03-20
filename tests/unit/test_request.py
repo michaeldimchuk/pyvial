@@ -5,6 +5,8 @@ from vial.errors import ServerError
 from vial.request import RequestContext
 from vial.types import HTTPMethod, LambdaContext, MultiDict, Request
 
+from tests import assertions
+
 
 @pytest.fixture(name="http_request")
 def http_request_fixture(context: LambdaContext) -> Request:
@@ -21,7 +23,7 @@ def test_get(http_request: Request) -> None:
 def test_elapsed_time(http_request: Request) -> None:
     with RequestContext(http_request) as context:
         assert request.elapsed_time()
-        assert request.elapsed_time() == context.elapsed_time
+        assertions.within_range(request.elapsed_time(), context.elapsed_time, 10)
 
 
 def test_remaining_time(http_request: Request) -> None:
