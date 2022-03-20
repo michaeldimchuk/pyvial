@@ -19,3 +19,8 @@ lint:
 format:
 	isort $(modules)
 	black $(modules)
+
+release:
+	poetry version minor
+	poetry build
+	poetry publish
