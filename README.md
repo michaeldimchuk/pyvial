@@ -1,4 +1,10 @@
 # Vial
+<p>
+    <a href="https://github.com/pre-commit/pre-commit">
+        <img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="Pre-Commit Enabled" style="max-width:100%;">
+    </a>
+</p>
+
 Vial is an unopinionated micro web framework for AWS Lambda. It's main purpose is to provide an easy to use
 interface while also making the core functionality of the framework as modular as possible.
 
@@ -155,20 +161,18 @@ that specific resource.
 
 Below is an example of registering a middleware to log route invocation:
 ```
-import logging
 from vial.app import Vial
 
 app = Vial(__name__)
 
-logger = logging.getLogger("my-app")
 
 @app.middleware
 def log_events(event: Request, chain: CallChain) -> Response:
-    logger.info("Began execution of %s", event.context)
+    app.logger.info("Began execution of %s", event.context)
     try:
         return chain(event)
     finally:
-        logger.info("Completed execution of %s", event.context)
+        app.logger.info("Completed execution of %s", event.context)
 
 
 @app.get("/hello-world")
