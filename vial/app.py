@@ -11,6 +11,18 @@ from vial.types import HTTPMethod, LambdaContext, MultiDict, Request, Response
 
 
 class RouteResolver:
+    """
+    Rudimentary resolver which tries to find a one to one mapping between the API Gateway resource
+    and a route defined within the Vial application. As an example an API Gateway may have a resource
+    under the "/users/{user_id}/addresses" path, which will be matched against an exact same mapping on
+    Vial, but will not be matched against "/users/something/addresses".
+
+    This approach only works when using direct routes and won't work with Proxy+ integrations, which don't
+    try to match against pre-defined resources. In such a use case, this class can be overridden with a
+    custom implementation and used to replace the Vial#route_resolver_class class field. For this use case,
+    the vial.gateway.RouteMatcher class can be used to match conventional URLs to route resources.
+    """
+
     def __call__(self, resources: dict[str, dict[HTTPMethod, Route]], request: Request) -> Route:
         if not (defined_routes := resources.get(request.resource)):
             raise NotFoundError(f"No route defined for {request.resource}")
@@ -23,6 +35,16 @@ class RouteResolver:
 
 class RouteInvoker:
     def __call__(self, route: Route, request: Request) -> Response:
+        """
+        Invokes the route function with path parameters passed in the exact same order as they
+        are defined in the route. This has the advantage of being able to rename path parameters
+        in code without affecting the API Gateway integration, which may not allow renames in
+        certain circumstances.
+
+        This behaviour can be modified to bind the path parameters by name to the route function
+        with kwarg style parameter passing, by overriding this class and using that as the new
+        value of the Vial#route_invoker_class field.
+        """
         args = self._build_args(route, request)
         result = route.function(*args.values())
         return self._to_response(result)
@@ -56,7 +78,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
 
     route_resolver_class = RouteResolver
 
-    invoker_class = RouteInvoker
+    route_invoker_class = RouteInvoker
 
     logger_factory_class = LoggerFactory
 
@@ -66,7 +88,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
         super().__init__()
         self.name = name
         self.route_resolver = self.route_resolver_class()
-        self.invoker = self.invoker_class()
+        self.invoker = self.route_invoker_class()
         self.json = self.json_class()
         self.logger = self.logger_factory_class.get(name)
 
