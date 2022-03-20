@@ -4,7 +4,7 @@ from logging import Formatter, Handler, Logger, StreamHandler
 
 class LoggerFactory:
 
-    DEFAULT_FORMAT = "[%(levelname)s] %(asctime)s %(filename)s.%(funcName)s: %(message)30s"
+    DEFAULT_FORMAT = "[%(levelname)s] %(asctime)s %(filename)s.%(funcName)s: %(message)s"
 
     @classmethod
     def get(cls, name: str) -> Logger:

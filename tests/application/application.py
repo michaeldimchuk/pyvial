@@ -18,13 +18,13 @@ app.register_resource(user_app)
 
 @app.middleware
 def log_events(event: Request, chain: CallChain) -> Response:
-    app.logger.info("Began execution of %s", event.context)
+    app.logger.info("Began execution of %s %s", event.method.name, event.path)
     try:
         response = chain(event)
         response.headers["logged"] = "middleware-executed"
         return response
     finally:
-        app.logger.info("Completed execution of %s", event.context)
+        app.logger.info("Completed execution of %s %s", event.method.name, event.path)
 
 
 @app.parser("list")
