@@ -23,15 +23,13 @@ class MultiDict(MutableMapping[K, list[V]]):  # pylint: disable=too-many-ancesto
         return self._values[key][0]
 
     def extend(self, key: K, value: list[V]) -> None:
-        existing_values = self._values.get(key)
-        if existing_values is not None:
+        if (existing_values := self._values.get(key)) is not None:
             existing_values.extend(value)
         else:
             self._values[key] = value
 
     def add(self, key: K, value: V) -> None:
-        existing_values = self._values.get(key)
-        if existing_values is not None:
+        if (existing_values := self._values.get(key)) is not None:
             existing_values.append(value)
         else:
             self._values[key] = [value]

@@ -6,19 +6,16 @@ from vial.loggers import LoggerFactory
 from vial.middleware import CallChain, MiddlewareAPI, MiddlewareChain
 from vial.parsers import ParserAPI
 from vial.request import RequestContext
-from vial.resources import Resource
 from vial.routes import Route, RoutingAPI
 from vial.types import HTTPMethod, LambdaContext, MultiDict, Request, Response
 
 
 class RouteResolver:
     def __call__(self, resources: dict[str, dict[HTTPMethod, Route]], request: Request) -> Route:
-        defined_routes = resources.get(request.resource)
-        if not defined_routes:
+        if not (defined_routes := resources.get(request.resource)):
             raise NotFoundError(f"No route defined for {request.resource}")
 
-        route = defined_routes.get(request.method)
-        if not route:
+        if not (route := defined_routes.get(request.method)):
             raise MethodNotAllowedError(f"No route defined for method {request.method.name}")
 
         return route
@@ -49,6 +46,12 @@ class RouteInvoker:
         return args
 
 
+class Resource(RoutingAPI, ParserAPI, MiddlewareAPI):
+    def __init__(self, name: str) -> None:
+        super().__init__()
+        self.name = name
+
+
 class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
 
     route_resolver_class = RouteResolver
@@ -68,9 +71,9 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
         self.logger = self.logger_factory_class.get(name)
 
     def register_resource(self, app: Resource) -> None:
-        ParserAPI.register_parsers(self, app)
-        RoutingAPI.register_routes(self, app)
-        MiddlewareAPI.register_middlewares(self, app)
+        self.register_parsers(app)
+        self.register_routes(app)
+        self.register_middlewares(app)
 
     def __call__(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         request = self._build_request(event, context)

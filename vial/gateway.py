@@ -34,8 +34,7 @@ class RouteMatcher:
             if len(parts) != len(url_parts):
                 continue
 
-            path_params = self._match_path(parts, url_parts)
-            if path_params is not None:
+            if (path_params := self._match_path(parts, url_parts)) is not None:
                 return Match(route_url, path_params, query_params)
         raise NotFoundError(f"No matching route found for {url}")
 

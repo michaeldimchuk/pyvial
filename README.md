@@ -128,7 +128,7 @@ blueprints of other popular frameworks like Flask.
 You can define a resource like this:
 ```
 # store.py
-from vial.resources import Resource
+from vial.app import Resource
 
 app = Resource(__name__)
 

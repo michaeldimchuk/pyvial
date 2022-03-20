@@ -2,9 +2,9 @@ import dataclasses
 from dataclasses import dataclass
 from typing import Optional, Type
 
+from vial.app import Resource
 from vial.errors import NotFoundError
 from vial.middleware import CallChain
-from vial.resources import Resource
 from vial.types import Request, Response
 
 app = Resource(__name__)

@@ -48,8 +48,7 @@ class ErrorHandler:
     def __call__(self, error: Exception) -> Response:
         for error_type in type(error).__mro__:
             if issubclass(error_type, Exception):
-                handler = self.error_handlers.get(error_type)
-                if handler:
+                if handler := self.error_handlers.get(error_type):
                     return handler(error)
         return self._default_handler(error)
 
@@ -64,8 +63,7 @@ class ErrorHandler:
     def _get_native_status_code(self, error: Exception) -> HTTPStatus:
         for error_type in type(error).__mro__:
             if issubclass(error_type, Exception):
-                status = self.DEFAULT_STATUSES.get(error_type)
-                if status:
+                if status := self.DEFAULT_STATUSES.get(error_type):
                     return status
         return HTTPStatus.INTERNAL_SERVER_ERROR
 

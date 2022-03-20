@@ -26,8 +26,7 @@ class KeywordParser:
         self.parsers = dict(self.DEFAULT_PARSERS)
 
     def get(self, name: str) -> Parser:
-        parser = self.parsers.get(name)
-        if not parser:
+        if not (parser := self.parsers.get(name)):
             raise ValueError(f"Parser '{name}' is not registered.")
         return parser
 

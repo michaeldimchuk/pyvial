@@ -36,8 +36,8 @@ class DefaultEncoder(JSONEncoder):
     ]
 
     def default(self, o: Any) -> Any:
-        for checker, encoder in self.ENCODERS:
-            if checker(o):
+        for type_matcher, encoder in self.ENCODERS:
+            if type_matcher(o):
                 return encoder(o)
         return super().default(o)
 
