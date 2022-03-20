@@ -86,7 +86,7 @@ class LambdaContext:
 
     @staticmethod
     def get_remaining_time_in_millis() -> int:
-        return 0
+        return 30_000
 
 
 class HTTPMethod(Enum):

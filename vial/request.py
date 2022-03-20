@@ -1,3 +1,4 @@
+import time
 from typing import Any, Optional
 
 from vial.errors import ServerError
@@ -9,6 +10,15 @@ class RequestContext:
 
     def __init__(self, request: Request) -> None:
         self.request = request
+        self.start_time = _get_timestamp()
+
+    @property
+    def elapsed_time(self) -> float:
+        return _get_timestamp() - self.start_time
+
+    @property
+    def remaining_time(self) -> int:
+        return self.request.context.get_remaining_time_in_millis()
 
     def __enter__(self) -> "RequestContext":
         RequestContext._INSTANCE = self
@@ -24,5 +34,17 @@ class RequestContext:
         return cls._INSTANCE
 
 
+def _get_timestamp() -> float:
+    return time.time() * 1000
+
+
 def get() -> Request:
     return RequestContext.active().request
+
+
+def elapsed_time() -> float:
+    return RequestContext.active().elapsed_time
+
+
+def remaining_time() -> int:
+    return RequestContext.active().remaining_time

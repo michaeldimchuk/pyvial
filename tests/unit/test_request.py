@@ -6,12 +6,27 @@ from vial.request import RequestContext
 from vial.types import HTTPMethod, LambdaContext, MultiDict, Request
 
 
-def test_get(context: LambdaContext) -> None:
-    http_request = Request(
+@pytest.fixture(name="http_request")
+def http_request_fixture(context: LambdaContext) -> Request:
+    return Request(
         {"hello": "world"}, context, HTTPMethod.GET, "/hello/world", "/hello/world", MultiDict(), MultiDict(), None
     )
+
+
+def test_get(http_request: Request) -> None:
     with RequestContext(http_request):
         assert request.get() == http_request
+
+
+def test_elapsed_time(http_request: Request) -> None:
+    with RequestContext(http_request) as context:
+        assert request.elapsed_time()
+        assert request.elapsed_time() == context.elapsed_time
+
+
+def test_remaining_time(http_request: Request) -> None:
+    with RequestContext(http_request):
+        assert request.remaining_time() == http_request.context.get_remaining_time_in_millis()
 
 
 def test_get_no_active_request() -> None:
