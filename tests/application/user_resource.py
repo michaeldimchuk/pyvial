@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import dataclasses
 from dataclasses import dataclass
-from typing import Optional, Type
 
 from vial.app import Resource
 from vial.errors import NotFoundError
@@ -29,7 +30,6 @@ def scoped_middleware(event: Request, chain: CallChain) -> Response:
 
 @app.get("/users/{user_id}")
 def get_user(user_id: str) -> dict[str, str]:
-    scenario: Optional[tuple[Type[Exception], str]] = _ERROR_SCENARIOS.get(user_id)
-    if scenario:
+    if scenario := _ERROR_SCENARIOS.get(user_id):
         raise scenario[0](scenario[1])
     return dataclasses.asdict(User(user_id, "John", "Doe"))

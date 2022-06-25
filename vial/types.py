@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from http import HTTPStatus
-from typing import Any, Iterator, MutableMapping, Optional, TypeVar, Union
+from typing import Any, Iterator, MutableMapping, TypeVar
 
 T = TypeVar("T")
 K = TypeVar("K")
@@ -9,7 +11,7 @@ V = TypeVar("V")
 
 
 class MultiDict(MutableMapping[K, list[V]]):  # pylint: disable=too-many-ancestors
-    def __init__(self, values: Optional[dict[K, list[V]]] = None) -> None:
+    def __init__(self, values: dict[K, list[V]] | None = None) -> None:
         super().__init__()
         self._values = values or {}
 
@@ -81,8 +83,8 @@ class LambdaContext:
     aws_request_id: str
     log_group_name: str
     log_stream_name: str
-    identity: Optional[CognitoIdentity] = None
-    client_context: Optional[ClientContext] = None
+    identity: CognitoIdentity | None = None
+    client_context: ClientContext | None = None
 
     @staticmethod
     def get_remaining_time_in_millis() -> int:
@@ -112,11 +114,11 @@ class Request(LambdaEvent):
     path: str
     headers: MultiDict[str, str]
     query_parameters: MultiDict[str, str]
-    body: Optional[str]
+    body: str | None
 
 
 @dataclass
 class Response:
-    body: Optional[Union[dict[str, Any], list[Any], str]] = None
+    body: dict[str, Any] | list[Any] | str | None = None
     headers: dict[str, str] = field(default_factory=dict)
-    status: Union[HTTPStatus, int] = HTTPStatus.OK
+    status: HTTPStatus | int = HTTPStatus.OK

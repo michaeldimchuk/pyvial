@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import json
 from http import HTTPStatus
-from typing import Any, Union
+from typing import Any
 
 from vial import request
 from vial.app import Vial
@@ -33,7 +35,7 @@ def set_parser(value: str) -> list[str]:
 
 
 @app.error_handler(CustomUnauthorizedError, CustomForbiddenError)
-def custom_error_handler(error: Union[CustomUnauthorizedError, CustomForbiddenError]) -> Response:
+def custom_error_handler(error: CustomUnauthorizedError | CustomForbiddenError) -> Response:
     status = HTTPStatus.UNAUTHORIZED if isinstance(error, CustomUnauthorizedError) else HTTPStatus.FORBIDDEN
     return Response({"message": str(error)}, status=status)
 

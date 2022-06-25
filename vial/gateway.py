@@ -1,14 +1,14 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Iterable, Optional, Type, Union
+from typing import Any, Iterable, Type
 from urllib.parse import parse_qs, urlparse
 
 from vial.app import Vial
 from vial.errors import NotFoundError
 from vial.json import Json, NativeJson
 from vial.types import HTTPMethod, LambdaContext, Response
-
-Headers = dict[str, Union[str, list[str]]]
 
 
 @dataclass
@@ -39,7 +39,7 @@ class RouteMatcher:
         raise NotFoundError(f"No matching route found for {url}")
 
     @staticmethod
-    def _match_path(parts: list[str], url_parts: list[str]) -> Optional[dict[str, str]]:
+    def _match_path(parts: list[str], url_parts: list[str]) -> dict[str, str] | None:
         path_params: dict[str, str] = {}
         for left, right in zip(parts, url_parts):
             if right.startswith("{") and right.endswith("}"):
@@ -66,26 +66,26 @@ class Gateway:
         self.json = self.json_class()
         self.matcher = RouteMatcher(list(app.routes))
 
-    def get(self, path: str, headers: Optional[Headers] = None) -> Response:
+    def get(self, path: str, headers: dict[str, str | list[str]] | None = None) -> Response:
         return self.request(HTTPMethod.GET, path, headers=headers)
 
     def request(
-        self, method: HTTPMethod, path: str, body: Optional[str] = None, headers: Optional[Headers] = None
+        self, method: HTTPMethod, path: str, body: str | None = None, headers: dict[str, str | list[str]] | None = None
     ) -> Response:
         request = self.build_request(method, path, body, headers)
         response = self.app(request, self.get_context())
         return self.build_response(response)
 
     def build_response(self, response: dict[str, Any]) -> Response:
-        body: Optional[str] = response["body"]
+        body: str | None = response["body"]
         return Response(self.json.loads(body) if body else None, response["headers"], response["statusCode"])
 
     def build_request(
         self,
         method: HTTPMethod,
         path: str,
-        body: Optional[str] = None,
-        headers: Optional[Headers] = None,
+        body: str | None = None,
+        headers: dict[str, str | list[str]] | None = None,
     ) -> dict[str, Any]:
         match = self.matcher.match(path)
         return {
@@ -99,7 +99,7 @@ class Gateway:
         }
 
     @staticmethod
-    def _build_headers(headers: Headers) -> dict[str, list[str]]:
+    def _build_headers(headers: dict[str, str | list[str]]) -> dict[str, list[str]]:
         multi_headers: dict[str, list[str]] = defaultdict(list)
         for name, value in headers.items():
             if isinstance(value, Iterable):
