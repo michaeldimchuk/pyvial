@@ -33,7 +33,6 @@ def _get_parsers() -> dict[str, Callable[[TextIO], Any]]:
 
 def _find_root() -> str:
     root = os.getcwd()
-    index = root.find("tests")
-    if index > 0:
+    if index := root.find("tests") > 0:
         root = root[0:index]
     return f"{root}/tests/resources/"

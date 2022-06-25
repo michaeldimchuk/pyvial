@@ -112,12 +112,10 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
             return self.default_error_handler(e)
 
     def _build_invocation_chain(self, route: Route) -> CallChain:
-        all_middleware = self.registered_middleware[self.name] + self.registered_middleware[route.resource]
-
         def route_invocation(event: Request) -> Response:
             return self.invoker(route, event)
 
-        if not all_middleware:
+        if not (all_middleware := self.registered_middleware[self.name] + self.registered_middleware[route.resource]):
             return route_invocation
 
         handler = MiddlewareChain(all_middleware[-1], route_invocation)
