@@ -45,7 +45,7 @@ app = Vial(__name__)
 def hello_world() -> dict[str, str]:
     return {"hello": "world"}
 ```
-A test case with this example is available in `tests/samples/test_with_app.py`.
+A test case with this example is available in [tests/samples/test_with_app.py](tests/samples/test_with_app.py).
 
 Basic `serverless.yml` file to deploy the project with the serverless framework:
 ```
@@ -95,7 +95,7 @@ def hello_world() -> dict[str, list[str]]:
         raise ValueError("Must provide at least one query parameter")
     return dict(query_params)
 ```
-A test case with this example is available in `tests/samples/test_with_current_request.py`.
+A test case with this example is available in [tests/samples/test_with_current_request.py](tests/samples/test_with_current_request.py).
 
 ### Path Parameters
 You can define path parameters like this:
@@ -104,7 +104,7 @@ You can define path parameters like this:
 def get_user(user_id: str) -> User:
     return user_service.get(user_id)
 ```
-A test case with this example is available in `tests/samples/test_with_path_parameters.py`.
+A test case with this example is available in [tests/samples/test_with_path_parameters.py](tests/samples/test_with_path_parameters.py).
 
 Vial supports some path parameter parsing as part of the invocation process. For example when using a UUID
 as a path parameter, Vial can convert it from a string to a UUID automatically:
@@ -115,7 +115,7 @@ from uuid import UUID
 def get_user(user_id: UUID) -> User:
     return user_service.get(user_id)
 ```
-A test case with this example is available in `tests/samples/test_with_parser.py`.
+A test case with this example is available in [tests/samples/test_with_parser.py](tests/samples/test_with_parser.py).
 
 The following parsers are supported by default:
 
@@ -141,7 +141,7 @@ def list_parser(value: str) -> list[str]:
 def get_user(user_ids: list[str]) -> list[User]:
     return [user_service.get(user_id) for user_id in user_ids]
 ```
-A test case with this example is available in `tests/samples/test_with_custom_parser.py`.
+A test case with this example is available in [tests/samples/test_with_custom_parser.py](tests/samples/test_with_custom_parser.py).
 
 ## Resources
 As your application grows, you may want to split certain functionality amongst resources and files, similar to
@@ -170,7 +170,7 @@ app = Vial(__name__)
 
 app.register_resource(stores_app)
 ```
-A test case with this example is available in `tests/samples/test_with_resources.py`.
+A test case with this example is available in [tests/samples/test_with_resources.py](tests/samples/test_with_resources.py).
 
 ## Middleware
 You can register middleware functions to be executed before / after route invocations. All middleware is scoped to
@@ -204,7 +204,7 @@ def log_events(event: Request, chain: CallChain) -> Response:
 def hello_world() -> dict[str, str | list[str]]:
     return {"hello": "world", **request.get().headers}
 ```
-A test case with this example is available in `tests/samples/test_with_middleware.py`.
+A test case with this example is available in [tests/samples/test_with_middleware.py](tests/samples/test_with_middleware.py).
 
 
 ## Json Encoding
@@ -242,7 +242,7 @@ def get_prices() -> dict[str, Decimal]:
     # Decimal is not supported natively by the json module, but is by simplejson.
     return {"bread": Decimal("42.24"), "cheese": Decimal("129.34")}
 ```
-A test case with this example is available in `tests/samples/test_with_json_encoding.py`.
+A test case with this example is available in [tests/samples/test_with_json_encoding.py](tests/samples/test_with_json_encoding.py).
 
 ## Testing
 The `vial.gateway.Gateway` class provides functionality to interact with the Vial application locally,
@@ -291,4 +291,4 @@ def test_create_store(gateway: Gateway) -> None:
     assert response.status == HTTPStatus.OK
     assert response.body == {"store_id": "my-cool-store", "store_name": "My very cool store"}
 ```
-This code is also available in `tests/samples/test_with_gateway.py`.
+This code is also available in [tests/samples/test_with_gateway.py](tests/samples/test_with_gateway.py).
