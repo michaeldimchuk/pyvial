@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Iterable, Type
+from typing import Any, Type
 from urllib.parse import parse_qs, urlparse
 
 from vial.app import Vial
@@ -69,6 +69,18 @@ class Gateway:
     def get(self, path: str, headers: dict[str, str | list[str]] | None = None) -> Response:
         return self.request(HTTPMethod.GET, path, headers=headers)
 
+    def post(self, path: str, body: str | None = None, headers: dict[str, str | list[str]] | None = None) -> Response:
+        return self.request(HTTPMethod.POST, path, body, headers)
+
+    def put(self, path: str, body: str | None = None, headers: dict[str, str | list[str]] | None = None) -> Response:
+        return self.request(HTTPMethod.PUT, path, body, headers)
+
+    def patch(self, path: str, body: str | None = None, headers: dict[str, str | list[str]] | None = None) -> Response:
+        return self.request(HTTPMethod.PATCH, path, body, headers)
+
+    def delete(self, path: str, headers: dict[str, str | list[str]] | None = None) -> Response:
+        return self.request(HTTPMethod.DELETE, path, headers=headers)
+
     def request(
         self, method: HTTPMethod, path: str, body: str | None = None, headers: dict[str, str | list[str]] | None = None
     ) -> Response:
@@ -102,10 +114,10 @@ class Gateway:
     def _build_headers(headers: dict[str, str | list[str]]) -> dict[str, list[str]]:
         multi_headers: dict[str, list[str]] = defaultdict(list)
         for name, value in headers.items():
-            if isinstance(value, Iterable):
-                multi_headers[name].extend(value)
-            else:
+            if isinstance(value, str):
                 multi_headers[name].append(value)
+            else:
+                multi_headers[name].extend(value)
         return multi_headers
 
     @staticmethod

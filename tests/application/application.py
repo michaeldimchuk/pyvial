@@ -66,6 +66,11 @@ def multiple_path_parameters(key: str, value: str) -> dict[str, str]:
     return {key: value}
 
 
+@app.get("/return/headers/in/response")
+def return_headers() -> dict[str, list[str]]:
+    return dict(request.get().headers)
+
+
 @app.get("/parser-type-returned/{some_variable:list}")
 def parser_type_returned(some_variable: list[str]) -> dict[str, Any]:
     return {"type": str(type(some_variable)), "value": some_variable}
