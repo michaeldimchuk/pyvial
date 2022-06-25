@@ -45,6 +45,8 @@ app = Vial(__name__)
 def hello_world() -> dict[str, str]:
     return {"hello": "world"}
 ```
+A test case with this example is available in `tests/samples/test_with_app.py`.
+
 Basic `serverless.yml` file to deploy the project with the serverless framework:
 ```
 service: my-function
@@ -74,7 +76,9 @@ plugins:
 You can now deploy the project with `serverless deploy`.
 
 ### Current Request
-The current request is tracked within a contextual object that wraps the lambda request. It can be accessed like so:
+The current request is tracked within a contextual object that wraps the lambda request, and can be accessed
+through the `vial.request` module. The `request.get()` function is only available during a lambda request,
+and will raise an error if called outside of one. It can be accessed like so:
 ```
 from vial import request
 from vial.app import Vial
@@ -91,7 +95,7 @@ def hello_world() -> dict[str, list[str]]:
         raise ValueError("Must provide at least one query parameter")
     return dict(query_params)
 ```
-The `request.get()` function is only available during a lambda request and will raise an error if called outside of one.
+A test case with this example is available in `tests/samples/test_with_current_request.py`.
 
 ### Path Parameters
 You can define path parameters like this:
@@ -100,6 +104,7 @@ You can define path parameters like this:
 def get_user(user_id: str) -> User:
     return user_service.get(user_id)
 ```
+A test case with this example is available in `tests/samples/test_with_path_parameters.py`.
 
 Vial supports some path parameter parsing as part of the invocation process. For example when using a UUID
 as a path parameter, Vial can convert it from a string to a UUID automatically:
@@ -110,6 +115,7 @@ from uuid import UUID
 def get_user(user_id: UUID) -> User:
     return user_service.get(user_id)
 ```
+A test case with this example is available in `tests/samples/test_with_parser.py`.
 
 The following parsers are supported by default:
 
@@ -122,7 +128,9 @@ The following parsers are supported by default:
 | `decimal`     | `decimal.Decimal` |
 | `uuid`        | `uuid.UUID`       |
 
-You can register your own parser like this:
+You can register your own parser that consumes a string variable and converts it to any other type.
+As parsers are bound directly to the registered route function, they have to be defined before the route
+function that uses one is registered.
 ```
 @app.parser("list")
 def list_parser(value: str) -> list[str]:
@@ -133,8 +141,7 @@ def list_parser(value: str) -> list[str]:
 def get_user(user_ids: list[str]) -> list[User]:
     return [user_service.get(user_id) for user_id in user_ids]
 ```
-As parsers are bound directly to the registered route function, they have to be defined before the route
-function that uses one is registered.
+A test case with this example is available in `tests/samples/test_with_custom_parser.py`.
 
 ## Resources
 As your application grows, you may want to split certain functionality amongst resources and files, similar to
