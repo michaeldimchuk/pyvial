@@ -178,6 +178,11 @@ where it's registered. A middleware function registered with the `Vial` instance
 the application, but a function registered with a `Resource` instance will only be invoked for routes defined in
 that specific resource.
 
+The route invocation will be the last callable in the call chain, so any middleware in the chain before can
+exit the request and prevent the route invocation or even any other middleware from being called, exiting instead.
+This may be helpful in cases where an application needs to fail early if the request isn't valid, like if a
+required header is missing.
+
 Below is an example of registering a middleware to log route invocation:
 ```
 from __future__ import annotations
