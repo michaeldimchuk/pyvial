@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 from typing import Any, Callable
 from uuid import UUID
@@ -54,5 +56,5 @@ class ParserAPI:
     def register_parser(self, name: str, parser: Callable[[str], T]) -> None:
         self.param_parser.register(name, parser)
 
-    def register_parsers(self, other: "ParserAPI") -> None:
+    def register_parsers(self, other: ParserAPI) -> None:
         self.param_parser.parsers.update(other.param_parser.parsers)

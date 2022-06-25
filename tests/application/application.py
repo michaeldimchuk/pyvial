@@ -61,6 +61,11 @@ def string_returned() -> str:
     return json.dumps({"status": "OK"})
 
 
+@app.get("/path/{key}/has/{value}/params")
+def multiple_path_parameters(key: str, value: str) -> dict[str, str]:
+    return {key: value}
+
+
 @app.get("/parser-type-returned/{some_variable:list}")
 def parser_type_returned(some_variable: list[str]) -> dict[str, Any]:
     return {"type": str(type(some_variable)), "value": some_variable}

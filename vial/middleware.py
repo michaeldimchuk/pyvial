@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import defaultdict
 from typing import Callable, Protocol
 
@@ -32,5 +34,5 @@ class MiddlewareAPI:
     def register_middleware(self, middleware: Callable[[Request, CallChain], T]) -> None:
         self.registered_middleware[self.name].append(middleware)
 
-    def register_middlewares(self, other: "MiddlewareAPI") -> None:
+    def register_middlewares(self, other: MiddlewareAPI) -> None:
         self.registered_middleware.update(other.registered_middleware)
