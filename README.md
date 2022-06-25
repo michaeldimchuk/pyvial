@@ -287,8 +287,9 @@ def test_health(gateway: Gateway) -> None:
 
 
 def test_create_store(gateway: Gateway) -> None:
-    response = gateway.post("/stores/my-cool-store", app.json.dumps({"store_name": "My very cool store"}))
+    body = app.json.dumps({"store_name": "My cool store"})
+    response = gateway.post("/stores/my-cool-store", body)
     assert response.status == HTTPStatus.OK
-    assert response.body == {"store_id": "my-cool-store", "store_name": "My very cool store"}
+    assert response.body == {"store_id": "my-cool-store", "store_name": "My cool store"}
 ```
 This code is also available in [tests/samples/test_with_gateway.py](tests/samples/test_with_gateway.py).
