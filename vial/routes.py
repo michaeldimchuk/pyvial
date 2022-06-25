@@ -19,11 +19,11 @@ class Route:
 
 
 class RoutingAPI:
-    name: str
     param_parser: KeywordParser
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, name: str) -> None:
+        super().__init__(name)  # type: ignore[call-arg] # https://github.com/python/mypy/issues/4335
+        self.name = name
         self.routes: dict[str, dict[HTTPMethod, Route]] = defaultdict(dict)
 
     def post(self, path: str, **kwargs: Any) -> Callable[[Callable[..., T]], Callable[..., T]]:

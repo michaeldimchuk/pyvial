@@ -207,6 +207,119 @@ def hello_world() -> dict[str, str | list[str]]:
 A test case with this example is available in [tests/samples/test_with_middleware.py](tests/samples/test_with_middleware.py).
 
 
+## Error Handling
+When errors are raised by the application, the default error handler will iterate the class inheritance hierarchy of the
+exception that was raised, trying to find the most fine grained error handler possible. Default error handlers for common
+exception types like `Exception` or `ValueError` are provided, but can be overridden. Below is a sample on how to register
+custom error handlers or override existing ones:
+```
+from http import HTTPStatus
+
+from vial.app import Vial
+from vial.gateway import Gateway
+from vial.types import Response
+
+app = Vial(__name__)
+
+
+class CustomError(Exception):
+    pass
+
+
+class ConfusedError(CustomError):
+    pass
+
+
+@app.error_handler(CustomError)
+def custom_error_handler(error: CustomError) -> Response:
+    return Response({"custom_message": str(error)}, status=HTTPStatus.IM_A_TEAPOT)
+
+
+@app.error_handler(ConfusedError)
+def confused_error_handler(error: ConfusedError) -> Response:
+    return Response({"custom_message": str(error)}, status=HTTPStatus.BAD_GATEWAY)
+
+
+@app.get("/teapot")
+def teapot() -> None:
+    raise CustomError("I really am a teapot")
+
+
+@app.get("/confused-teapot")
+def confused_teapot() -> None:
+    raise ConfusedError("I'm a really confused teapot")
+```
+A test case with this example is available in [tests/samples/test_with_error_handling.py](tests/samples/test_with_error_handling.py).
+
+Error handlers are bound to the resource they were registered in, whether that's the global `Vial` application or
+a specific `Resource` instance. When an error occurs in a route, the "owner" application / resource is taken into consideration when
+choosing the error handler to use.
+
+An error handler registered in a `Resource` will always have precedence over a global error handler registered in the `Vial`
+application. This allows for resources to either override global error handling mechanisms or add customization for more
+fine grained exception types.
+
+Note that the most fine grained error handler is always chosen, no matter where it comes from. That means that in a scenario
+like this:
+```
+class First(Exception):
+    pass
+
+class Second(First):
+    pass
+
+class Third(Second):
+    pass
+```
+If the `Vial` application registers error handlers for `First` and `Third` while the `Resource` registers an override for
+`Second`, then when an exception of type `Third` is thrown, the global error handler will be used because it has a closer
+match to the exception, even if its parent is overridden in the `Resource`.
+
+Below is an example of a `Resource` specific error handler:
+```
+from http import HTTPStatus
+
+from vial.app import Resource, Vial
+from vial.types import Response
+
+app = Vial(__name__)
+
+confused_app = Resource(f"confused_{__name__}")
+
+
+class CustomError(Exception):
+    pass
+
+
+class ConfusedError(CustomError):
+    pass
+
+
+@app.error_handler(CustomError)
+def custom_error_handler(error: CustomError) -> Response:
+    return Response({"custom_message": str(error)}, status=HTTPStatus.IM_A_TEAPOT)
+
+
+@confused_app.error_handler(ConfusedError)
+def confused_error_handler(error: ConfusedError) -> Response:
+    return Response({"custom_message": str(error)}, status=HTTPStatus.BAD_GATEWAY)
+
+
+@app.get("/teapot")
+def teapot() -> None:
+    raise CustomError("I really am a teapot")
+
+
+@confused_app.get("/confused-teapot")
+def confused_teapot() -> None:
+    raise ConfusedError("I'm a really confused teapot")
+
+
+app.register_resource(confused_app)
+```
+A test case with this example is available in [tests/samples/test_with_resource_error_handling.py](tests/samples/test_with_resource_error_handling.py).
+
+
 ## Json Encoding
 You can customize how Vial serializes / deserializes JSON objects by passing a custom encoder. The below
 example shows how to substitute the native JSON module with another library like `simplejson`:

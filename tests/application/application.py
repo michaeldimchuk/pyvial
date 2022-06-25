@@ -9,7 +9,7 @@ from vial.app import Vial
 from vial.middleware import CallChain
 from vial.types import HTTPMethod, Request, Response
 
-from tests.application.exceptions import CustomForbiddenError, CustomUnauthorizedError
+from tests.application.exceptions import CustomForbiddenError, CustomUnauthorizedError, ResourceCustomizedError
 from tests.application.user_resource import app as user_app
 
 app = Vial(__name__)
@@ -104,3 +104,8 @@ def really_bad_error() -> None:
 @app.route("/method-test", [HTTPMethod.OPTIONS, HTTPMethod.TRACE])
 def return_method() -> dict[str, str]:
     return {"method": request.get().method.name}
+
+
+@app.get("/resource-custom-error-in-app")
+def resource_custom_error() -> None:
+    raise ResourceCustomizedError("Raised from the app")

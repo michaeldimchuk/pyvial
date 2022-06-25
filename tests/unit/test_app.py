@@ -119,7 +119,7 @@ def test_missing_default_handler(gateway: Gateway) -> None:
     assert response.body == {"message": "This can't happen"}
 
 
-@patch.dict(app.default_error_handler.error_handlers, {Exception: None})
+@patch.dict(app.default_error_handler.error_handlers, {app.name: {Exception: None}})
 @patch.dict(app.default_error_handler.DEFAULT_STATUSES, {Exception: None})
 def test_missing_default_handler_and_default_status(gateway: Gateway) -> None:
     response = gateway.get("/really-bad-error")
@@ -132,3 +132,13 @@ def test_method_bindings(method: HTTPMethod, gateway: Gateway) -> None:
     response = gateway.request(method, "/method-test")
     assert response.status == HTTPStatus.OK
     assert response.body == {"method": method.name}
+
+
+def test_error_handler_scoping(gateway: Gateway) -> None:
+    response = gateway.get("/resource-custom-error-in-app")
+    assert response.status == HTTPStatus.UNAUTHORIZED
+    assert response.body == {"message": "Raised from the app"}
+
+    response = gateway.get("/resource-custom-error-in-resource")
+    assert response.status == HTTPStatus.IM_A_TEAPOT
+    assert response.body == {"message": "Raised from the resource"}

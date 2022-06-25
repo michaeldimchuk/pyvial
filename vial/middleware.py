@@ -21,10 +21,9 @@ class MiddlewareChain:
 
 
 class MiddlewareAPI:
-    name: str
-
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, name: str) -> None:
+        super().__init__(name)  # type: ignore[call-arg] # https://github.com/python/mypy/issues/4335
+        self.name = name
         self.registered_middleware: dict[str, list[Callable[[Request, CallChain], T]]] = defaultdict(list)
 
     def middleware(self, function: Callable[[Request, CallChain], T]) -> Callable[[Request, CallChain], T]:

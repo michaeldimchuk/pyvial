@@ -39,11 +39,11 @@ class KeywordParser:
 
 
 class ParserAPI:
-
     parser_class = KeywordParser
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, name: str) -> None:
+        super().__init__(name)  # type: ignore[call-arg] # https://github.com/python/mypy/issues/4335
+        self.name = name
         self.param_parser = self.parser_class()
 
     def parser(self, name: str) -> Callable[[Callable[[str], T]], Callable[[str], T]]:

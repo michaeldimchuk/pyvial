@@ -4,3 +4,7 @@ class CustomForbiddenError(Exception):
 
 class CustomUnauthorizedError(Exception):
     pass
+
+
+class ResourceCustomizedError(CustomUnauthorizedError):
+    pass

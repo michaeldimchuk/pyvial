@@ -68,9 +68,9 @@ class RouteInvoker:
         return args
 
 
-class Resource(RoutingAPI, ParserAPI, MiddlewareAPI):
+class Resource(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
     def __init__(self, name: str) -> None:
-        super().__init__()
+        super().__init__(name)
         self.name = name
 
 
@@ -85,7 +85,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
     json_class: Type[Json] = NativeJson
 
     def __init__(self, name: str) -> None:
-        super().__init__()
+        super().__init__(name)
         self.name = name
         self.route_resolver = self.route_resolver_class()
         self.invoker = self.route_invoker_class()
@@ -96,6 +96,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
         self.register_parsers(app)
         self.register_routes(app)
         self.register_middlewares(app)
+        self.register_error_handlers(app)
 
     def __call__(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         request = self._build_request(event, context)
@@ -104,12 +105,14 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
             return self._to_lambda_response(response)
 
     def _handle_request(self, request: Request) -> Response:
+        route_resource = self.name  # If a route can't be found, default to the global application
         try:
             route = self.route_resolver(self.routes, request)
+            route_resource = route.resource
             return self._build_invocation_chain(route)(request)
         except Exception as e:  # pylint: disable=broad-except
             self.logger.exception("Encountered uncaught exception")
-            return self.default_error_handler(e)
+            return self.default_error_handler(route_resource, e)
 
     def _build_invocation_chain(self, route: Route) -> CallChain:
         def route_invocation(event: Request) -> Response:
