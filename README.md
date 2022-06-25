@@ -1,7 +1,16 @@
 # Vial
 <p>
+    <a href="https://pypi.org/project/pyvial/">
+        <img src="https://badgen.net/pypi/v/pyvial" alt="Latest Version" style="max-width:100%;">
+    </a>
+    <a href="https://github.com/michaeldimchuk/pyvial/actions/workflows/tests.yaml">
+        <img src="https://github.com/michaeldimchuk/pyvial/actions/workflows/tests.yaml/badge.svg" alt="Test Status" style="max-width:100%;">
+    </a>
     <a href="https://github.com/pre-commit/pre-commit">
         <img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="Pre-Commit Enabled" style="max-width:100%;">
+    </a>
+    <a href="https://github.com/psf/black">
+        <img src="https://badgen.net/badge/code-style/black/000" alt="Code Style: Black" style="max-width:100%;">
     </a>
 </p>
 
