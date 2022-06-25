@@ -128,30 +128,33 @@ As parsers are bound directly to the registered route function, they have to be 
 function that uses one is registered.
 
 ## Resources
-As your application grows, you may want to split certain functionality amongst resources, similar to
+As your application grows, you may want to split certain functionality amongst resources and files, similar to
 blueprints of other popular frameworks like Flask.
 
 You can define a resource like this:
 ```
-# store.py
-from vial.app import Resource
+from dataclasses import dataclass
 
-app = Resource(__name__)
+from vial.app import Resource, Vial
+
+stores_app = Resource(__name__)
 
 
-@app.get("/stores/{store_id}")
+@dataclass
+class Store:
+    store_id: str
+
+
+@stores_app.get("/stores/{store_id}")
 def get_store(store_id: str) -> Store:
-    return store_service.get(store_id)
-
-
-# app.py
-from stores import app as stores_app
+    return Store(store_id)
 
 
 app = Vial(__name__)
 
 app.register_resource(stores_app)
 ```
+A test case with this example is available in `tests/samples/test_with_resources.py`.
 
 ## Middleware
 You can register middleware functions to be executed before / after route invocations. All middleware is scoped to
@@ -161,7 +164,12 @@ that specific resource.
 
 Below is an example of registering a middleware to log route invocation:
 ```
+from __future__ import annotations
+
+from vial import request
 from vial.app import Vial
+from vial.middleware import CallChain
+from vial.types import Request, Response
 
 app = Vial(__name__)
 
@@ -169,6 +177,7 @@ app = Vial(__name__)
 @app.middleware
 def log_events(event: Request, chain: CallChain) -> Response:
     app.logger.info("Began execution of %s", event.context)
+    event.headers["custom-injected-header"] = "hello there"
     try:
         return chain(event)
     finally:
@@ -176,16 +185,21 @@ def log_events(event: Request, chain: CallChain) -> Response:
 
 
 @app.get("/hello-world")
-def hello_world() -> dict[str, str]:
-    return {"hello": "world"}
+def hello_world() -> dict[str, str | list[str]]:
+    return {"hello": "world", **request.get().headers}
 ```
+A test case with this example is available in `tests/samples/test_with_middleware.py`.
 
 
 ## Json Encoding
 You can customize how Vial serializes / deserializes JSON objects by passing a custom encoder. The below
 example shows how to substitute the native JSON module with another library like `simplejson`:
 ```
+from decimal import Decimal
+from typing import Any
+
 import simplejson
+
 from vial.app import Vial
 from vial.json import Json
 
@@ -199,9 +213,66 @@ class SimpleJson(Json):
     def loads(value: str) -> Any:
         return simplejson.loads(value)
 
-class SimpleJsonVial:
+
+class SimpleJsonVial(Vial):
     json_class = SimpleJson
 
 
-app = SimpleJsonVial()
+app = SimpleJsonVial(__name__)
+
+
+@app.get("/prices")
+def get_prices() -> dict[str, Decimal]:
+    # Decimal is not supported natively by the json module, but is by simplejson.
+    return {"bread": Decimal("42.24"), "cheese": Decimal("129.34")}
 ```
+A test case with this example is available in `tests/samples/test_with_json_encoding.py`.
+
+## Testing
+The `vial.gateway.Gateway` class provides functionality to interact with the Vial application locally,
+without deploying to AWS Lambda. It can be constructed using the original `Vial` application instance,
+exposing the application endpoints with basic URL path matching.
+
+Here is an example test case using `pytest`:
+```
+from http import HTTPStatus
+
+import pytest
+
+from vial import request
+from vial.app import Vial
+from vial.errors import BadRequestError
+from vial.gateway import Gateway
+
+app = Vial(__name__)
+
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "OK"}
+
+
+@app.post("/stores/{store_id}")
+def create_store(store_id: str) -> dict[str, str]:
+    if not (body := request.get().body):
+        raise BadRequestError("Bad request")
+    return {"store_id": store_id, **app.json.loads(body)}
+
+
+@pytest.fixture(name="gateway")
+def gateway_fixture() -> Gateway:
+    return Gateway(app)
+
+
+def test_health(gateway: Gateway) -> None:
+    response = gateway.get("/health")
+    assert response.status == HTTPStatus.OK
+    assert response.body == {"status": "OK"}
+
+
+def test_create_store(gateway: Gateway) -> None:
+    response = gateway.post("/stores/my-cool-store", app.json.dumps({"store_name": "My very cool store"}))
+    assert response.status == HTTPStatus.OK
+    assert response.body == {"store_id": "my-cool-store", "store_name": "My very cool store"}
+```
+This code is also available in `tests/samples/test_with_gateway.py`.

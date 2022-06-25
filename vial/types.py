@@ -42,8 +42,11 @@ class MultiDict(MutableMapping[K, list[V]]):  # pylint: disable=too-many-ancesto
     def __len__(self) -> int:
         return len(self._values)
 
-    def __setitem__(self, key: K, value: list[V]) -> None:
-        self._values[key] = value
+    def __setitem__(self, key: K, value: list[V] | V) -> None:
+        if isinstance(value, list):
+            self._values[key] = value
+        else:
+            self._values[key] = [value]
 
     def __str__(self) -> str:
         return str(self._values)
