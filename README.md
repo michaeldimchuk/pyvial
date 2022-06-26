@@ -9,9 +9,6 @@
     <a href="https://github.com/pre-commit/pre-commit">
         <img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="Pre-Commit Enabled" style="max-width:100%;">
     </a>
-    <a href="https://github.com/psf/black">
-        <img src="https://badgen.net/badge/code-style/black/000" alt="Code Style: Black" style="max-width:100%;">
-    </a>
 </p>
 
 Vial is an unopinionated micro web framework for AWS Lambda. It's main purpose is to provide an easy to use
