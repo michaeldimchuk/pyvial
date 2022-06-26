@@ -5,14 +5,13 @@ from collections import defaultdict
 from http import HTTPStatus
 from typing import Callable, Type, TypeVar, cast
 
-from vial.exceptions import ServerError, VialError
+from vial.exceptions import HTTPError, ServerError, VialError
 from vial.types import Response
 
 E = TypeVar("E", bound=Exception)
 
 
 class ErrorHandler:
-
     DEFAULT_STATUSES = {
         Exception: HTTPStatus.INTERNAL_SERVER_ERROR,
         ValueError: HTTPStatus.BAD_REQUEST,
@@ -23,6 +22,7 @@ class ErrorHandler:
         self.name = name
         self.error_handlers: dict[str, dict[Type[Exception], Callable[[Exception], Response]]] = defaultdict(dict)
         self.register_handler(Exception, self._default_handler)
+        self.register_handler(HTTPError, self._http_error_handler)
         self.register_handler(ServerError, self._server_error_handler)
 
     def register_handler(self, error_type: Type[Exception], handler: Callable[[E], Response]) -> None:
@@ -45,9 +45,13 @@ class ErrorHandler:
     def _server_error_handler(self, error: ServerError) -> Response:
         return Response(dataclasses.asdict(error.error), status=error.status)
 
+    def _http_error_handler(self, error: HTTPError) -> Response:
+        body = dataclasses.asdict(VialError.UNKNOWN_ERROR.get(str(error)))
+        return Response(body, status=error.status)
+
     def _default_handler(self, error: Exception) -> Response:
-        response = dataclasses.asdict(VialError.UNKNOWN_ERROR.get(str(error)))
-        return Response(response, status=self._get_native_status_code(error))
+        body = dataclasses.asdict(VialError.UNKNOWN_ERROR.get(str(error)))
+        return Response(body, status=self._get_native_status_code(error))
 
     def _get_native_status_code(self, error: Exception) -> HTTPStatus:
         for error_type in type(error).__mro__:

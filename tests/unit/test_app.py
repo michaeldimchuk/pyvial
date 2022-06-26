@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
+from vial.exceptions import VialError
 from vial.gateway import Gateway
 from vial.types import HTTPMethod
 
@@ -116,7 +117,7 @@ def _build_gateway_event(method: HTTPMethod, path: str) -> dict[str, Any]:
 def test_missing_default_handler(gateway: Gateway) -> None:
     response = gateway.get("/really-bad-error")
     assert response.status == HTTPStatus.INTERNAL_SERVER_ERROR
-    assert response.body == {"code": "UNKNOWN_ERROR", "message": "This can't happen"}
+    assert response.body == {"code": VialError.UNKNOWN_ERROR.name, "message": "This can't happen"}
 
 
 @patch.dict(app.default_error_handler.error_handlers, {app.name: {Exception: None}})
@@ -124,7 +125,7 @@ def test_missing_default_handler(gateway: Gateway) -> None:
 def test_missing_default_handler_and_default_status(gateway: Gateway) -> None:
     response = gateway.get("/really-bad-error")
     assert response.status == HTTPStatus.INTERNAL_SERVER_ERROR
-    assert response.body == {"code": "UNKNOWN_ERROR", "message": "This can't happen"}
+    assert response.body == {"code": VialError.UNKNOWN_ERROR.name, "message": "This can't happen"}
 
 
 @pytest.mark.parametrize("method", HTTPMethod)
@@ -142,3 +143,9 @@ def test_error_handler_scoping(gateway: Gateway) -> None:
     response = gateway.get("/resource-custom-error-in-resource")
     assert response.status == HTTPStatus.IM_A_TEAPOT
     assert response.body == {"message": "Raised from the resource"}
+
+
+def test_custom_http_error(gateway: Gateway) -> None:
+    response = gateway.get("/custom-http-error")
+    assert response.status == HTTPStatus.GATEWAY_TIMEOUT
+    assert response.body == {"code": VialError.UNKNOWN_ERROR.name, "message": "Well how did this happen"}

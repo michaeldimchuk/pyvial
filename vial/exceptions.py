@@ -32,9 +32,11 @@ class VialError(ErrorCodeBuilder, Enum):
     UNKNOWN_ERROR = auto(), "{}"
 
 
-class ServerError(Exception):
+class HTTPError(Exception):
     status = HTTPStatus.INTERNAL_SERVER_ERROR
 
+
+class ServerError(HTTPError):
     def __init__(self, error: ErrorCode) -> None:
         super().__init__(error.message)
         self.error = error

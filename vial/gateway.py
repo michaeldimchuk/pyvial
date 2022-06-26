@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Type
-from urllib.parse import parse_qs, urlparse
+from urllib import parse
 
 from vial.app import Vial
 from vial.exceptions import NotFoundError, VialError
@@ -23,8 +23,8 @@ class RouteMatcher:
         self.routes = sorted(routes)
 
     def match(self, url: str) -> Match:
-        parsed_url = urlparse(url)
-        query_params = parse_qs(parsed_url.query, keep_blank_values=True)
+        parsed_url = parse.urlparse(url)
+        query_params = parse.parse_qs(parsed_url.query, keep_blank_values=True)
         path = self._remove_trailing_slash(parsed_url.path)
         return self._find_match(url, path.split("/"), query_params)
 

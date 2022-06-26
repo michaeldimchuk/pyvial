@@ -9,7 +9,12 @@ from vial.app import Vial
 from vial.middleware import CallChain
 from vial.types import HTTPMethod, Request, Response
 
-from tests.application.exceptions import CustomForbiddenError, CustomUnauthorizedError, ResourceCustomizedError
+from tests.application.exceptions import (
+    CustomForbiddenError,
+    CustomUnauthorizedError,
+    GatewayTimeoutError,
+    ResourceCustomizedError,
+)
 from tests.application.user_resource import app as user_app
 
 app = Vial(__name__)
@@ -109,3 +114,8 @@ def return_method() -> dict[str, str]:
 @app.get("/resource-custom-error-in-app")
 def resource_custom_error() -> None:
     raise ResourceCustomizedError("Raised from the app")
+
+
+@app.get("/custom-http-error")
+def custom_http_error() -> None:
+    raise GatewayTimeoutError("Well how did this happen")
