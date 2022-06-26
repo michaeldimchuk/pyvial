@@ -44,7 +44,7 @@ def hello_world() -> dict[str, str]:
 ```
 A test case with this example is available in [tests/samples/test_with_app.py](tests/samples/test_with_app.py).
 
-Basic `serverless.yml` file to deploy the project with the serverless framework:
+Basic `serverless.yml` file to deploy the project with the [serverless framework](https://www.serverless.com/framework/docs/getting-started):
 ```
 service: my-function
 provider:
@@ -131,7 +131,8 @@ class User:
 
 @app.get("/users/{user_id:uuid}")
 def get_user(user_id: UUID) -> User:
-    assert isinstance(user_id, UUID)
+    if not isinstance(user_id, UUID):
+        raise AssertionError("Invalid input")
     return User(user_id)
 ```
 A test case with this example is available in [tests/samples/test_with_parser.py](tests/samples/test_with_parser.py).
@@ -156,9 +157,11 @@ def list_parser(value: str) -> list[str]:
     return [value]
 
 
-@app.get("/users/{user_id:list}")
-def get_user(user_ids: list[str]) -> list[User]:
-    return [user_service.get(user_id) for user_id in user_ids]
+@app.get("/users/{user_ids:list}")
+def get_users(user_ids: list[str]) -> list[User]:
+    if not isinstance(user_ids, list) or len(user_ids) != 1:
+        raise AssertionError("Invalid input")
+    return list(map(User, user_ids))
 ```
 A test case with this example is available in [tests/samples/test_with_custom_parser.py](tests/samples/test_with_custom_parser.py).
 

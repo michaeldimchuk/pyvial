@@ -15,7 +15,8 @@ class User:
 
 @app.get("/users/{user_id:uuid}")
 def get_user(user_id: UUID) -> User:
-    assert isinstance(user_id, UUID)
+    if not isinstance(user_id, UUID):
+        raise AssertionError("Invalid input")
     return User(user_id)
 
 

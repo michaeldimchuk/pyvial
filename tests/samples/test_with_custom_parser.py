@@ -20,8 +20,8 @@ def list_parser(value: str) -> list[str]:
 
 @app.get("/users/{user_ids:list}")
 def get_users(user_ids: list[str]) -> list[User]:
-    assert isinstance(user_ids, list)
-    assert len(user_ids) == 1
+    if not isinstance(user_ids, list) or len(user_ids) != 1:
+        raise AssertionError("Invalid input")
     return list(map(User, user_ids))
 
 
