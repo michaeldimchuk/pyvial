@@ -24,3 +24,5 @@ release:
 	poetry version minor
 	poetry build
 	poetry publish
+	git tag $(shell poetry version -s)
+	git push origin $(shell poetry version -s)
