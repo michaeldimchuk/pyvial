@@ -1,3 +1,4 @@
+import base64
 from http import HTTPStatus
 from typing import Any
 from unittest.mock import patch
@@ -149,3 +150,13 @@ def test_custom_http_error(gateway: Gateway) -> None:
     response = gateway.get("/custom-http-error")
     assert response.status == HTTPStatus.GATEWAY_TIMEOUT
     assert response.body == {"code": VialError.UNKNOWN_ERROR.name, "message": "Well how did this happen"}
+
+
+def test_body_base64_encoded(gateway: Gateway) -> None:
+    body = base64.b64encode(gateway.app.json.dumps({"hello": "world"}).encode("utf-8")).decode("utf-8")
+    request = gateway.build_request(HTTPMethod.POST, "/return-base64-data", body)
+    request["isBase64Encoded"] = True
+    native_response = gateway.app(request, gateway.get_context())
+    response = gateway.build_response(native_response)
+    assert response.status == HTTPStatus.OK
+    assert response.body == {"payload": {"hello": "world"}}

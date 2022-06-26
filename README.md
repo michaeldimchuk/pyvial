@@ -394,7 +394,7 @@ import pytest
 
 from vial import request
 from vial.app import Vial
-from vial.errors import BadRequestError
+from vial.exceptions import BadRequestError
 from vial.gateway import Gateway
 
 app = Vial(__name__)

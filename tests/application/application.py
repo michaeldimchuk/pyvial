@@ -6,6 +6,7 @@ from typing import Any
 
 from vial import request
 from vial.app import Vial
+from vial.exceptions import BadRequestError, ErrorCode
 from vial.middleware import CallChain
 from vial.types import HTTPMethod, Request, Response
 
@@ -119,3 +120,10 @@ def resource_custom_error() -> None:
 @app.get("/custom-http-error")
 def custom_http_error() -> None:
     raise GatewayTimeoutError("Well how did this happen")
+
+
+@app.post("/return-base64-data")
+def return_base64_data() -> dict[str, str]:
+    if not (body := request.get().body):
+        raise BadRequestError(ErrorCode("INVALID_REQUEST", "Must provide a body"))
+    return {"payload": app.json.loads(body)}

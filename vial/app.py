@@ -1,4 +1,5 @@
-from typing import Any, Type
+import base64
+from typing import Any, Type, cast
 
 from vial.errors import ErrorHandlingAPI
 from vial.exceptions import MethodNotAllowedError, NotFoundError, VialError
@@ -134,8 +135,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
             body = response.body
         return {"headers": response.headers, "statusCode": response.status, "body": body}
 
-    @staticmethod
-    def _build_request(event: dict[str, Any], context: LambdaContext) -> Request:
+    def _build_request(self, event: dict[str, Any], context: LambdaContext) -> Request:
         return Request(
             event,
             context,
@@ -144,5 +144,11 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
             event["path"],
             MultiDict(event["multiValueHeaders"]),
             MultiDict(event["multiValueQueryStringParameters"]),
-            event["body"],
+            self._get_body(event),
         )
+
+    @staticmethod
+    def _get_body(event: dict[str, Any]) -> str:
+        if event.get("isBase64Encoded"):
+            return base64.b64decode(event["body"]).decode("utf-8")
+        return cast(str, event["body"])
