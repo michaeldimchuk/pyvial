@@ -86,9 +86,7 @@ app = Vial(__name__)
 
 @app.get("/hello-world")
 def hello_world() -> dict[str, list[str]]:
-    request: Request = request.get()
-    query_params = request.query_parameters
-    if not query_params:
+    if not (query_params := request.get().query_parameters):
         raise ValueError("Must provide at least one query parameter")
     return dict(query_params)
 ```
@@ -97,20 +95,44 @@ A test case with this example is available in [tests/samples/test_with_current_r
 ### Path Parameters
 You can define path parameters like this:
 ```
+from dataclasses import dataclass
+
+from vial.app import Vial
+
+app = Vial(__name__)
+
+
+@dataclass
+class User:
+    user_id: str
+
+
 @app.get("/users/{user_id}")
 def get_user(user_id: str) -> User:
-    return user_service.get(user_id)
+    return User(user_id)
 ```
 A test case with this example is available in [tests/samples/test_with_path_parameters.py](tests/samples/test_with_path_parameters.py).
 
 Vial supports some path parameter parsing as part of the invocation process. For example when using a UUID
 as a path parameter, Vial can convert it from a string to a UUID automatically:
 ```
-from uuid import UUID
+from dataclasses import dataclass
+from uuid import UUID, uuid4
+
+from vial.app import Vial
+
+app = Vial(__name__)
+
+
+@dataclass
+class User:
+    user_id: UUID
+
 
 @app.get("/users/{user_id:uuid}")
 def get_user(user_id: UUID) -> User:
-    return user_service.get(user_id)
+    assert isinstance(user_id, UUID)
+    return User(user_id)
 ```
 A test case with this example is available in [tests/samples/test_with_parser.py](tests/samples/test_with_parser.py).
 

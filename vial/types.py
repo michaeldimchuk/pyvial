@@ -91,6 +91,10 @@ class LambdaContext:
 
     @staticmethod
     def get_remaining_time_in_millis() -> int:
+        """
+        This is never used at runtime, the AWS provided context is used instead,
+        and this is just a placeholder for tests and type hints.
+        """
         return 30_000
 
 

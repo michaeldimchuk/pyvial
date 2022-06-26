@@ -67,7 +67,7 @@ def test_get_user_scoped_middleware(gateway: Gateway) -> None:
 def test_get_user_not_found(gateway: Gateway) -> None:
     response = gateway.get("/users/not_found")
     assert response.status == HTTPStatus.NOT_FOUND
-    assert response.body == {"message": "User not found"}
+    assert response.body == {"code": "USER_NOT_FOUND", "message": "User not found"}
 
 
 def test_query_params(gateway: Gateway) -> None:
@@ -116,7 +116,7 @@ def _build_gateway_event(method: HTTPMethod, path: str) -> dict[str, Any]:
 def test_missing_default_handler(gateway: Gateway) -> None:
     response = gateway.get("/really-bad-error")
     assert response.status == HTTPStatus.INTERNAL_SERVER_ERROR
-    assert response.body == {"message": "This can't happen"}
+    assert response.body == {"code": "UNKNOWN_ERROR", "message": "This can't happen"}
 
 
 @patch.dict(app.default_error_handler.error_handlers, {app.name: {Exception: None}})
@@ -124,7 +124,7 @@ def test_missing_default_handler(gateway: Gateway) -> None:
 def test_missing_default_handler_and_default_status(gateway: Gateway) -> None:
     response = gateway.get("/really-bad-error")
     assert response.status == HTTPStatus.INTERNAL_SERVER_ERROR
-    assert response.body == {"message": "This can't happen"}
+    assert response.body == {"code": "UNKNOWN_ERROR", "message": "This can't happen"}
 
 
 @pytest.mark.parametrize("method", HTTPMethod)

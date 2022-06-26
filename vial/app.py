@@ -1,6 +1,6 @@
 from typing import Any, Type
 
-from vial.errors import ErrorHandlingAPI, MethodNotAllowedError, NotFoundError
+from vial.errors import ErrorHandlingAPI, MethodNotAllowedError, NotFoundError, VialError
 from vial.json import Json, NativeJson
 from vial.loggers import LoggerFactory
 from vial.middleware import CallChain, MiddlewareAPI, MiddlewareChain
@@ -25,10 +25,10 @@ class RouteResolver:
 
     def __call__(self, resources: dict[str, dict[HTTPMethod, Route]], request: Request) -> Route:
         if not (defined_routes := resources.get(request.resource)):
-            raise NotFoundError(f"No route defined for {request.resource}")
+            raise NotFoundError(VialError.ROUTE_NOT_FOUND.get(request.resource))
 
         if not (route := defined_routes.get(request.method)):
-            raise MethodNotAllowedError(f"No route defined for method {request.method.name}")
+            raise MethodNotAllowedError(VialError.METHOD_NOT_ALLOWED.get(request.resource, request.method.name))
 
         return route
 

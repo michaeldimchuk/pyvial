@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from http import HTTPStatus
 
 from vial.app import Resource
-from vial.errors import NotFoundError
+from vial.errors import ErrorCode, NotFoundError
 from vial.middleware import CallChain
 from vial.types import Request, Response
 
@@ -21,7 +21,7 @@ class User:
     last_name: str
 
 
-_ERROR_SCENARIOS = {"not_found": (NotFoundError, "User not found")}
+_ERROR_SCENARIOS = {"not_found": (NotFoundError, ErrorCode("USER_NOT_FOUND", "User not found"))}
 
 
 @app.error_handler(ResourceCustomizedError)

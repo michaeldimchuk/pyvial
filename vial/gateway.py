@@ -6,7 +6,7 @@ from typing import Any, Type
 from urllib.parse import parse_qs, urlparse
 
 from vial.app import Vial
-from vial.errors import NotFoundError
+from vial.errors import NotFoundError, VialError
 from vial.json import Json, NativeJson
 from vial.types import HTTPMethod, LambdaContext, Response
 
@@ -36,7 +36,7 @@ class RouteMatcher:
 
             if (path_params := self._match_path(parts, url_parts)) is not None:
                 return Match(route_url, path_params, query_params)
-        raise NotFoundError(f"No matching route found for {url}")
+        raise NotFoundError(VialError.ROUTE_NOT_FOUND.get(url))
 
     @staticmethod
     def _match_path(parts: list[str], url_parts: list[str]) -> dict[str, str] | None:

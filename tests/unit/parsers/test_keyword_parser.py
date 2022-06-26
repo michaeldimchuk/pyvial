@@ -4,6 +4,7 @@ from uuid import UUID
 
 import pytest
 
+from vial.errors import ServerError, VialError
 from vial.parsers import KeywordParser
 
 
@@ -17,12 +18,14 @@ def test_default_parsers(name: str, parser: Callable[[str], Any]) -> None:
 
 
 def test_unknown_parser() -> None:
-    pytest.raises(ValueError, KeywordParser().get, "hello")
+    cause = pytest.raises(ServerError, KeywordParser().get, "hello")
+    assert cause.value.error.code == VialError.PARSER_NOT_REGISTERED.name
 
 
 def test_register() -> None:
     parser = KeywordParser()
-    pytest.raises(ValueError, parser.get, "hello")
+    cause = pytest.raises(ServerError, parser.get, "hello")
+    assert cause.value.error.code == VialError.PARSER_NOT_REGISTERED.name
 
     parser.register("hello", set)
 
@@ -30,4 +33,5 @@ def test_register() -> None:
 
 
 def test_register_already_exists() -> None:
-    pytest.raises(ValueError, KeywordParser().register, "str", str)
+    cause = pytest.raises(ServerError, KeywordParser().register, "str", str)
+    assert cause.value.error.code == VialError.PARSER_ALREADY_EXISTS.name

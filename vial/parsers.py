@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import Any, Callable
 from uuid import UUID
 
+from vial.errors import ServerError, VialError
 from vial.types import T
 
 Parser = Callable[[str], Any]
@@ -29,12 +30,12 @@ class KeywordParser:
 
     def get(self, name: str) -> Parser:
         if not (parser := self.parsers.get(name)):
-            raise ValueError(f"Parser '{name}' is not registered.")
+            raise ServerError(VialError.PARSER_NOT_REGISTERED.get(name))
         return parser
 
     def register(self, name: str, parser: Parser) -> None:
         if name in self.parsers:
-            raise ValueError(f"Parser for keyword {name} already exists")
+            raise ServerError(VialError.PARSER_ALREADY_EXISTS.get(name))
         self.parsers[name] = parser
 
 

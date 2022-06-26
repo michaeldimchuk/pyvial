@@ -10,13 +10,13 @@ app = Vial(__name__)
 
 @dataclass
 class User:
-    user_id: str
+    user_id: UUID
 
 
 @app.get("/users/{user_id:uuid}")
 def get_user(user_id: UUID) -> User:
     assert isinstance(user_id, UUID)
-    return User(str(user_id))
+    return User(user_id)
 
 
 def test_get_user() -> None:

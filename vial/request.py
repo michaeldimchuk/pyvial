@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from vial import timestamps
-from vial.errors import ServerError
+from vial.errors import ServerError, VialError
 from vial.types import Request
 
 
@@ -32,7 +32,7 @@ class RequestContext:
     @classmethod
     def active(cls) -> RequestContext:
         if not cls._INSTANCE:
-            raise ServerError("Not currently within a request")
+            raise ServerError(VialError.NOT_IN_REQUEST.get())
         return cls._INSTANCE
 
 
