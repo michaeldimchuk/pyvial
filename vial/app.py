@@ -149,6 +149,7 @@ class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
 
     @staticmethod
     def _get_body(event: dict[str, Any]) -> str:
-        if event.get("isBase64Encoded"):
-            return base64.b64decode(event["body"]).decode("utf-8")
-        return cast(str, event["body"])
+        body = event["body"]
+        if event.get("isBase64Encoded") and body:
+            return base64.b64decode(body).decode("utf-8")
+        return cast(str, body)
