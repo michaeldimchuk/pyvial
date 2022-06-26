@@ -1,6 +1,7 @@
 from typing import Any, Type
 
-from vial.errors import ErrorHandlingAPI, MethodNotAllowedError, NotFoundError, VialError
+from vial.errors import ErrorHandlingAPI
+from vial.exceptions import MethodNotAllowedError, NotFoundError, VialError
 from vial.json import Json, NativeJson
 from vial.loggers import LoggerFactory
 from vial.middleware import CallChain, MiddlewareAPI, MiddlewareChain

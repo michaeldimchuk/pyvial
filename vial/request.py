@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from vial import timestamps
-from vial.errors import ServerError, VialError
+from vial.exceptions import ServerError, VialError
 from vial.types import Request
 
 

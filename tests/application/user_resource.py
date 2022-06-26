@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from http import HTTPStatus
 
 from vial.app import Resource
-from vial.errors import ErrorCode, NotFoundError
+from vial.exceptions import ErrorCode, NotFoundError
 from vial.middleware import CallChain
 from vial.types import Request, Response
 

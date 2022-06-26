@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Any, Callable
 from uuid import UUID
 
-from vial.errors import ServerError, VialError
+from vial.exceptions import ServerError, VialError
 from vial.types import T
 
 Parser = Callable[[str], Any]

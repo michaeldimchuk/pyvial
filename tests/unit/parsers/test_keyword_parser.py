@@ -4,7 +4,7 @@ from uuid import UUID
 
 import pytest
 
-from vial.errors import ServerError, VialError
+from vial.exceptions import ServerError, VialError
 from vial.parsers import KeywordParser
 
 

@@ -3,7 +3,7 @@ from typing import Type
 
 import pytest
 
-from vial.errors import (
+from vial.exceptions import (
     BadRequestError,
     ForbiddenError,
     MethodNotAllowedError,

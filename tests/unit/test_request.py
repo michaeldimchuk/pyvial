@@ -1,7 +1,7 @@
 import pytest
 
 from vial import request
-from vial.errors import ServerError
+from vial.exceptions import ServerError
 from vial.request import RequestContext
 from vial.types import HTTPMethod, LambdaContext, MultiDict, Request
 

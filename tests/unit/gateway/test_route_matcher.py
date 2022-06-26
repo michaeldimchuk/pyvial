@@ -1,6 +1,6 @@
 import pytest
 
-from vial.errors import NotFoundError
+from vial.exceptions import NotFoundError
 from vial.gateway import RouteMatcher
 
 from tests.application.application import app

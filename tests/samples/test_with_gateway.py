@@ -4,7 +4,7 @@ import pytest
 
 from vial import request
 from vial.app import Vial
-from vial.errors import BadRequestError, ErrorCode
+from vial.exceptions import BadRequestError, ErrorCode
 from vial.gateway import Gateway
 
 app = Vial(__name__)

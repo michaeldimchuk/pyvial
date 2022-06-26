@@ -6,7 +6,7 @@ from typing import Any, Type
 from urllib.parse import parse_qs, urlparse
 
 from vial.app import Vial
-from vial.errors import NotFoundError, VialError
+from vial.exceptions import NotFoundError, VialError
 from vial.json import Json, NativeJson
 from vial.types import HTTPMethod, LambdaContext, Response
 
