@@ -45,7 +45,7 @@ def health() -> dict[str, str]:
 A test case with this example is available in [tests/samples/test_with_app.py](tests/samples/test_with_app.py).
 
 The project can be deployed with the [serverless framework](https://www.serverless.com/framework/docs/getting-started).
-To get started with serverless for the first time, run the following commands:
+To get started with serverless for the first time, run the following commands in your project directory:
 ```
 yarn add --dev serverless serverless-python-requirements
 ```
