@@ -38,39 +38,56 @@ from vial.app import Vial
 app = Vial(__name__)
 
 
-@app.get("/hello-world")
-def hello_world() -> dict[str, str]:
-    return {"hello": "world"}
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "OK"}
 ```
 A test case with this example is available in [tests/samples/test_with_app.py](tests/samples/test_with_app.py).
 
-Basic `serverless.yml` file to deploy the project with the [serverless framework](https://www.serverless.com/framework/docs/getting-started):
+The project can be deployed with the [serverless framework](https://www.serverless.com/framework/docs/getting-started).
+To get started with serverless for the first time, run the following commands:
 ```
-service: my-function
+yarn add --dev serverless serverless-python-requirements
+```
+
+Below is a basic `serverless.yml` file to configure and deploy the project. It assumes that the only file to deploy
+is app.py, and the Vial object is defined there as a variable named `app`.
+```
+service: store
+
+custom:
+  pythonRequirements:
+    usePoetry: true
+    slim: true
+
 provider:
   name: aws
   runtime: python3.9
   memorySize: 128
   region: us-west-2
 
-package:
-  patterns:
-    - app.py
-
 functions:
   api:
     handler: app.app
     events:
-      - http: get /hello-world
-
-custom:
-  pythonRequirements:
-    usePoetry: true
+      - http: get /health
 
 plugins:
   - serverless-python-requirements
+
+package:
+  patterns:
+    - "app.py"
+    - "!.*/**"
+    - "!package.json"
+    - "!yarn.json"
+    - "!node_modules"
+    - "poetry.lock"
+    - "pyproject.toml"
 ```
-You can now deploy the project with `serverless deploy`.
+You can now deploy the project with `yarn run serverless deploy`.
+
+An example of this application is available at [samples/store/serverless.yml](samples/store/serverless.yml).
 
 ### Current Request
 The current request is tracked within a contextual object that wraps the lambda request, and can be accessed

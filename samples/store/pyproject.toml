@@ -1,0 +1,70 @@
+[tool.poetry]
+name = "store"
+version = "1.0.0"
+description = "A store microservice."
+license = "Apache-2.0"
+authors = ["Michael Dimchuk <michaeldimchuk@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyvial = "^1.1.0"
+
+[tool.poetry.dev-dependencies]
+isort = "^5.10.1"
+mypy = "^0.961"
+black = "^22.6.0"
+pylint = "^2.14.3"
+flake8 = "^4.0.1"
+flake8-bugbear = "^22.6.22"
+bandit = "^1.7.4"
+pre-commit = "^2.19.0"
+pytest = "^7.1.2"
+coverage = "^6.4.1"
+flake8-print = "^5.0.0"
+flake8-comprehensions = "^3.10.0"
+flake8-functions = "^0.0.7"
+flake8-eradicate = "^1.2.1"
+flake8-pie = "^0.15.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER", "TESTS"]
+profile = "black"
+line_length = 120
+known_tests = ["tests"]
+combine_as_imports = true
+
+[tool.black]
+line-length = 120
+
+[tool.pylint.SIMILARITIES]
+ignore-imports = "yes"
+
+[tool.pylint."MESSAGES CONTROL"]
+max-line-length = 120
+min-public-methods = 1
+function-rgx = "[a-z_][a-z0-9_]{1,40}$|()^test_[a-z_][a-z0-9_]{1,60}$"
+method-rgx = "[a-z_][a-z0-9_]{1,40}$"
+good-names = ["e", "i", "T", "E", "K", "V"]
+disable = [
+    "C0114",  # missing-module-docstring
+    "C0115",  # missing-class-docstring
+    "C0116",  # missing-function-docstring
+    "R0902",  # too-many-instance-attributes
+    "R0903",  # too-few-public-methods
+    "E1101",  # no-member Broken with enums, this case is covered by mypy
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["vial"]
+
+[tool.coverage.report]
+exclude_lines = ["pass"]
+precision = 2
+fail_under = 100

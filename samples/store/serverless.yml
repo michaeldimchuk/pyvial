@@ -1,0 +1,31 @@
+service: store
+
+custom:
+  pythonRequirements:
+    usePoetry: true
+    slim: true
+
+provider:
+  name: aws
+  runtime: python3.9
+  memorySize: 128
+  region: us-west-2
+
+functions:
+  api:
+    handler: app.app
+    events:
+      - http: get /health
+
+plugins:
+  - serverless-python-requirements
+
+package:
+  patterns:
+    - "app.py"
+    - "!.*/**"
+    - "!package.json"
+    - "!yarn.json"
+    - "!node_modules"
+    - "poetry.lock"
+    - "pyproject.toml"
