@@ -29,6 +29,7 @@ class VialError(ErrorCodeBuilder, Enum):
     PARSER_NOT_REGISTERED = auto(), "Parser '{}' is not registered"
     PARSER_ALREADY_EXISTS = auto(), "Parser '{}' is already registered"
     NOT_IN_REQUEST = auto(), "Not currently within a request"
+    INVALID_TIMESTAMP_ZONE = auto(), "Only UTC timestamps are supported, got {}"
     UNKNOWN_ERROR = auto(), "{}"
 
 
