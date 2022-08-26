@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from logging import DEBUG, Handler, Logger, LogRecord
 from typing import Any, cast
 from unittest.mock import MagicMock
@@ -31,12 +32,13 @@ def logger_fixture(request: pytest.FixtureRequest) -> Logger:
     return log
 
 
-def test_format_time() -> None:
+def test_format_time_default() -> None:
     formatter = JsonFormatter()
     record = MagicMock()
     record.created = 1656391930
-    timestamp = formatter.formatTime(record, "%Y-%m-%dT%H:%M:%S")
-    assert timestamp == "2022-06-27T21:52:10"
+    timestamp_format = "%Y-%m-%dT%H:%M:%S"
+    timestamp = formatter.formatTime(record, timestamp_format)
+    assert timestamp == time.strftime(timestamp_format, time.localtime(1656391930))
 
 
 def test_log_normal(logger: Logger) -> None:
