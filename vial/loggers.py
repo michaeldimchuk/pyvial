@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-import json
 import logging
 from logging import Formatter, Handler, Logger, LogRecord, StreamHandler
+from typing import Any, Type
 
 from vial import timestamps
+from vial.json import Json, NativeJson
 
 
 class LoggerFactory:
@@ -27,11 +28,17 @@ class LoggerFactory:
 
 
 class JsonFormatter(Formatter):
+
+    json_class: Type[Json] = NativeJson
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.json = self.json_class()
+
     def format(self, record: LogRecord) -> str:
         json_record = self.to_record(record)
         self.add_traceback(record, json_record)
-        # Need to use the json provided by Vial
-        return json.dumps(json_record)
+        return self.json.dumps(json_record)
 
     def add_traceback(self, record: LogRecord, json_record: dict[str, str]) -> None:
         if record.exc_info:
