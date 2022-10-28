@@ -6,7 +6,7 @@ init:
 
 test:
 	coverage run -m pytest
-	coverage report -m --precision 2
+	coverage report -m
 
 lint:
 	isort --check $(modules)
