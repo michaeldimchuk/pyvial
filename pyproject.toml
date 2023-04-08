@@ -12,7 +12,7 @@ repository = "https://github.com/michaeldimchuk/pyvial"
 [tool.poetry.dependencies]
 python = "^3.9"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.linting.dependencies]
 isort = "^5.12.0"
 mypy = "^1.2.0"
 black = "^23.3.0"
@@ -20,15 +20,19 @@ pylint = "^2.17.2"
 flake8 = "^6.0.0"
 flake8-bugbear = "^23.3.23"
 bandit = "^1.7.5"
-pre-commit = "^3.2.2"
-pytest = "^7.2.2"
-coverage = {version = "^7.2.3", extras = ["toml"]}
 flake8-print = "^5.0.0"
 flake8-comprehensions = "^3.11.1"
 flake8-functions = "^0.0.7"
 flake8-pie = "^0.16.0"
+types-simplejson = "^3.18.0.3"
+
+[tool.poetry.group.testing.dependencies]
+pytest = "^7.2.2"
 simplejson = "^3.19.1"
-types-simplejson = "^3.18.0"
+coverage = {version = "^7.2.3", extras = ["toml"]}
+
+[tool.poetry.group.local.dependencies]
+pre-commit = "^3.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
