@@ -58,7 +58,6 @@ class RouteMatcher:
 
 
 class Gateway:
-
     json_class: Type[Json] = NativeJson
 
     def __init__(self, app: Vial) -> None:

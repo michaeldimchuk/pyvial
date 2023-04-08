@@ -9,7 +9,6 @@ from vial.json import Json, NativeJson
 
 
 class LoggerFactory:
-
     DEFAULT_FORMAT = "[%(levelname)s] %(asctime)s %(filename)s.%(funcName)s: %(message)s"
 
     @classmethod
@@ -28,7 +27,6 @@ class LoggerFactory:
 
 
 class JsonFormatter(Formatter):
-
     json_class: Type[Json] = NativeJson
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

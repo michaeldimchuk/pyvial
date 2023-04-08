@@ -77,7 +77,6 @@ class Resource(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
 
 
 class Vial(RoutingAPI, ParserAPI, MiddlewareAPI, ErrorHandlingAPI):
-
     route_resolver_class = RouteResolver
 
     route_invoker_class = RouteInvoker

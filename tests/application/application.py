@@ -99,7 +99,7 @@ def custom_unauthorized_error() -> None:
 
 @app.get("/really-bad-error")
 def really_bad_error() -> None:
-    raise Exception("This can't happen")
+    raise RuntimeError("This can't happen")
 
 
 @app.get("/method-test")

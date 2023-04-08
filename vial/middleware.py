@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Callable, Protocol
 
-from vial.types import Request, Response, T
+from vial.types import Request, Response
 
 
 class CallChain(Protocol):
@@ -24,13 +24,15 @@ class MiddlewareAPI:
     def __init__(self, name: str) -> None:
         super().__init__(name)  # type: ignore[call-arg] # https://github.com/python/mypy/issues/4335
         self.name = name
-        self.registered_middleware: dict[str, list[Callable[[Request, CallChain], T]]] = defaultdict(list)
+        self.registered_middleware: dict[str, list[Callable[[Request, CallChain], Response]]] = defaultdict(list)
 
-    def middleware(self, function: Callable[[Request, CallChain], T]) -> Callable[[Request, CallChain], T]:
+    def middleware(
+        self, function: Callable[[Request, CallChain], Response]
+    ) -> Callable[[Request, CallChain], Response]:
         self.register_middleware(function)
         return function
 
-    def register_middleware(self, middleware: Callable[[Request, CallChain], T]) -> None:
+    def register_middleware(self, middleware: Callable[[Request, CallChain], Response]) -> None:
         self.registered_middleware[self.name].append(middleware)
 
     def register_middlewares(self, other: MiddlewareAPI) -> None:
